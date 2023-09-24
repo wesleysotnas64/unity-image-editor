@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
-
 using Scripts.Effects;
+using Scripts.Utils;
+using System.Collections.Generic;
+using UnityEngine.Windows;
+using UnityEngine.UIElements.Experimental;
 
 public class Manager : MonoBehaviour
 {
@@ -10,16 +13,15 @@ public class Manager : MonoBehaviour
     public Texture2D outputTexture;
     public Image inputRender;
     public Image outputRender;
+    public List<Texture2D> effects;
+    public int currentEffect;
 
     [Header("Dropdown Control")]
     public Dropdown dropdown; 
 
     [Header("Negative Control")]
     public bool negativeActive;
-    public float negativeLevel;
     public GameObject negativePanel;
-    public Slider negativeSliderLevel;
-    public Text negativeTextLevel;
 
     [Header("Threshold Control")]
     public bool thresholdActive;
@@ -28,82 +30,203 @@ public class Manager : MonoBehaviour
     public Slider thresholdSliderLevel;
     public Text thresholdTextLevel;
 
+    [Header("Blur Control")]
+    public bool blurActive;
+    public int blurLevel;
+    public int blurMaxLevel;
+    public GameObject blurPanel;
+    public Slider blurSliderLevel;
+    public Text blurTextLevel;
+
+    [Header("Gamma Correcition Control")]
+    public bool gammaActive;
+    public float gammaLevel;
+    public float gammaMaxLevel;
+    public GameObject gammaPanel;
+    public Slider gammaSliderLevel;
+    public Text gammaTextLevel;
+
+    [Header("Grey Scale Control")]
+    public bool greyScaleActive;
+    public float greyScaleMax;
+    public float greyScaleWeightRed;
+    public float greyScaleWeightGreen;
+    public float greyScaleWeightBlue;
+    public GameObject greyScalePanel;
+    public Slider greyScaleWeightRedSlider;
+    public Slider greyScaleWeightGreenSlider;
+    public Slider greyScaleWeightBlueSlider;
+    public Text greyScaleWeightRedText;
+    public Text greyScaleWeightGreenText;
+    public Text greyScaleWeightBlueText;
+
+    [Header("Pixelization Control")]
+    public bool pixelizationActive;
+    public int pixelizationPixelSize;
+    public int pixelizationPixelSizeMax;
+    public GameObject pixelizationPanel;
+    public Slider pixelizationPixelSizeSlider;
+    public Text pixelizationPixelSizeText;
+
     private void Start()
     {
         negativeActive = false;
         thresholdActive = false;
+        blurActive = false;
+        gammaActive = false;
+        greyScaleActive = false;
+        pixelizationActive = false;
 
-        if (inputRender != null)
+        blurMaxLevel = 4;
+        gammaMaxLevel = 2.0f;
+
+        greyScaleMax = 5.0f;
+        greyScaleWeightRed = 1.0f;
+        greyScaleWeightGreen = 1.0f;
+        greyScaleWeightBlue = 1.0f;
+        pixelizationPixelSizeMax = 32;
+
+        effects = new List<Texture2D>();
+        currentEffect = 0;
+        if(inputRender != null)
         {
-            inputRender.sprite = Sprite.Create(
-                    inputTexture,
-                    new Rect(0, 0, inputTexture.width, inputTexture.height),
-                    Vector2.zero
-            );
+            if(inputTexture == null)
+            {
+                inputTexture = LinearEffects.ColorFromDist(new Texture2D(300, 300));
+            }
 
-            outputRender.sprite = inputRender.sprite;
-
+            effects.Add(inputTexture);
         }
+
+        RenderInput();
+        RenderManager();
+
+        UpdatePanels();
     }
 
-    private void Update()
-    {
-        DropdownManager();
-        PanelManager();
 
-        if(Input.GetMouseButtonUp(0))
-        {
-            RenderManager();
-        }
-    }
 
     public void RenderManager()
     {
-        if (inputTexture != null)
+
+        //Chama o efeitos da classe Effects
+        SelectEffect();
+
+        //FilterConv filterConv = new FilterConv();
+        //float[,] mask = new float[3,3];
+        //for (int i = 0; i < 3; i++)
+        //{
+        //    for (int j = 0; j < 3; j++)
+        //    {
+        //        mask[i, j] = 1 / 9;
+        //    }
+        //}
+        //Debug.Log(mask);
+        //filterConv.DefFilter(mask, 3);
+        //outputTexture = filterConv.Conv(inputTexture);
+
+        //Renderiza no painel de saída
+        RenderOutput();
+    }
+
+    private void RenderInput()
+    {
+        if(inputRender != null)
         {
-            //Renderiza no painel de entrada
-            if (inputRender != null)
-            {
-                inputRender.sprite = Sprite.Create(
-                        inputTexture,
-                        new Rect(0, 0, inputTexture.width, inputTexture.height),
-                        Vector2.zero
-                );
-            }
+            Texture2D renderTexture = effects[currentEffect];
+            inputRender.sprite = Sprite.Create(
+                    renderTexture,
+                    new Rect(0, 0, renderTexture.width, renderTexture.height),
+                    Vector2.zero
+            );
+        }
+    }
 
-            //Chama o efeitos da classe Effects
-            SelectEffect();
-
-            //Renderiza no painel de saída
-            if (outputRender != null)
-            {
-                outputRender.sprite = Sprite.Create(
-                        outputTexture,
-                        new Rect(0, 0, outputTexture.width, outputTexture.height),
-                        Vector2.zero
-                );
-            }
-
+    private void RenderOutput()
+    {
+        if (outputRender != null)
+        {
+            outputRender.sprite = Sprite.Create(
+                    outputTexture,
+                    new Rect(0, 0, outputTexture.width, outputTexture.height),
+                    Vector2.zero
+            );
         }
     }
 
     private void SelectEffect()
     {
+        Texture2D renderTexture = effects[currentEffect];
         if (negativeActive)
         {
-            outputTexture = Effects.Negative(inputTexture, negativeLevel);
+            outputTexture = LinearEffects.Negative(renderTexture);
         }
         else if (thresholdActive)
         {
-            outputTexture = Effects.Threshold(inputTexture, thresholdLevel);
+            outputTexture = LinearEffects.Threshold(renderTexture, thresholdLevel);
+        }
+        else if (blurActive)
+        {
+            outputTexture = NonLinearEffects.Blur(renderTexture, blurLevel);
+        }
+        else if (gammaActive)
+        {
+            outputTexture = LinearEffects.GammaCorrection(renderTexture, gammaLevel);
+        }
+        else if (greyScaleActive)
+        {
+            outputTexture = LinearEffects.GrayScale(renderTexture, greyScaleWeightRed, greyScaleWeightGreen, greyScaleWeightBlue);
+        }
+        else if (pixelizationActive)
+        {
+            outputTexture = LinearEffects.Pixelization(renderTexture, pixelizationPixelSize);
         }
         else
-        {  
-            outputTexture = inputTexture;
+        {
+            outputTexture = renderTexture;
         }
     }
 
-    //Seleciona painel.
+    public void Undo()
+    {
+        if (currentEffect > 0)
+        {
+            currentEffect--;
+        }
+
+        UpdatePanels();
+        RenderInput();
+        RenderManager();
+    }
+
+    public void Redo()
+    {
+        if(currentEffect < effects.Count - 1)
+        {
+            currentEffect++;
+        }
+        UpdatePanels();
+        RenderInput();
+        RenderManager();
+    }
+
+    public void ApplyEffect()
+    {
+        effects.Add(outputTexture);
+        currentEffect = effects.Count - 1;
+
+        UpdatePanels();
+        RenderInput();
+        RenderManager();
+
+    }
+
+    public void UpdatePanels()
+    {
+        DropdownManager();
+        PanelManager();
+    }
+
     private void DropdownManager()
     {
         if (dropdown != null)
@@ -115,16 +238,64 @@ public class Manager : MonoBehaviour
                 case 0: // Desativado
                     negativeActive = false;
                     thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
                     break;
 
                 case 1: //Negativo
                     negativeActive = true;
                     thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
                     break;
 
                 case 2: // Threshold
                     negativeActive = false;
                     thresholdActive = true;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    break;
+
+                case 3: //Blur
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = true;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    break;
+
+                case 4: //Gamma Correction
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = true;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    break;
+
+                case 5: //Grey Scale
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = true;
+                    pixelizationActive = false;
+                    break;
+
+                case 6: //Pixelization
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = true;
                     break;
 
                 default:
@@ -133,23 +304,52 @@ public class Manager : MonoBehaviour
         }
     }
 
-    //Obtem os valores dos paineis.
     private void PanelManager()
     {
         //Altera visibilidade dos painéis.
         negativePanel.SetActive(negativeActive);
         thresholdPanel.SetActive(thresholdActive);
+        blurPanel.SetActive(blurActive);
+        gammaPanel.SetActive(gammaActive);
+        greyScalePanel.SetActive(greyScaleActive);
+        pixelizationPanel.SetActive(pixelizationActive);
         
-        // Consome e retorna para interface os valores de acordo com o painel ativo.
         if( negativeActive )
-        {   //Exemplo
-            negativeLevel = negativeSliderLevel.value; //Consome valor do slider.
-            negativeTextLevel.text = negativeLevel.ToString(); // Altera texto ao lado do slider.
+        {   
         }
         else if( thresholdActive)
         {
             thresholdLevel = thresholdSliderLevel.value;
             thresholdTextLevel.text = thresholdLevel.ToString();
+        }
+        else if( blurActive )
+        {
+            blurLevel = (int) (blurSliderLevel.value * blurMaxLevel);
+            blurSliderLevel.value = (float) blurLevel/blurMaxLevel;
+            blurTextLevel.text = blurLevel.ToString();
+
+        }
+        else if( gammaActive )
+        {
+            gammaLevel = gammaSliderLevel.value * gammaMaxLevel;
+            gammaSliderLevel.value = gammaLevel/gammaMaxLevel;
+            gammaTextLevel.text = gammaLevel.ToString();
+        }
+        else if ( greyScaleActive )
+        {
+            greyScaleWeightRed = greyScaleWeightRedSlider.value * greyScaleMax;
+            greyScaleWeightRedText.text = (greyScaleWeightRed/greyScaleMax).ToString();
+
+            greyScaleWeightGreen = greyScaleWeightGreenSlider.value * greyScaleMax;
+            greyScaleWeightGreenText.text = (greyScaleWeightGreen / greyScaleMax).ToString();
+
+            greyScaleWeightBlue = greyScaleWeightBlueSlider.value * greyScaleMax;
+            greyScaleWeightBlueText.text = (greyScaleWeightBlue / greyScaleMax).ToString();
+        }
+        else if ( pixelizationActive )
+        {
+            pixelizationPixelSize = (int) (pixelizationPixelSizeSlider.value * pixelizationPixelSizeMax);
+            pixelizationPixelSizeText.text = pixelizationPixelSize.ToString();
         }
     }
 
