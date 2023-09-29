@@ -11,11 +11,12 @@ namespace Scripts.Utils
         private Color minValue;
         private Color maxValue;
         private Color[,] imgProc;
+        private Color[,] img;
 
         public FilterConv()
         {
-            minValue = new Color(0, 0, 0, 1);
-            maxValue = new Color(0, 0, 0, 1);
+            minValue = new Color(99999,99999,99999,1);
+            maxValue = new Color(-99999, -99999, -99999, 1);
         }
 
         public void DefFilter(float[,] mask, int sizeMask = 3)
@@ -35,49 +36,76 @@ namespace Scripts.Utils
         public Texture2D Conv(Texture2D texture)
         {
             int desloc = (sizeMask - 1) / 2;
-            imgProc = new Color[texture.width, texture.height];
 
-            for (int i = 0; i < texture.width; i++)
+            imgProc = new Color[texture.height, texture.width];
+            img = new Color[texture.height, texture.width];
+
+            int xText;
+            int yText = 0;
+            for (int i = 0; i < texture.height; i++)
             {
-                for (int j = 0; j < texture.height; j++)
+                xText = 0;
+                for (int j = 0; j < texture.width; j++)
                 {
-                    imgProc[i, j] = CalcKernel(texture, i, j, desloc);
+                    img[i, j] = texture.GetPixel(xText, yText);
+                    xText++;
+                }
+                yText++;
+            }
+
+            for (int i = 0; i < texture.height; i++)
+            {
+                for (int j = 0; j < texture.width; j++)
+                {
+                    imgProc[i, j] = CalcKernel(texture.width, texture.height, i, j, desloc);
                 }
             }
 
             NormalizeImgProc(texture.width, texture.height);
 
             Texture2D t = new Texture2D(texture.width, texture.height);
-            for (int i = 0; i < texture.width; i++)
+            imgProc = img;
+            yText = 0;
+            for (int i = 0; i < texture.height; i++)
             {
-                for (int j = 0; j < texture.height; j++)
+                xText = 0;
+                for (int j = 0; j < texture.width; j++)
                 {
-                    t.SetPixel(i, j, imgProc[i, j]);
+                    t.SetPixel(xText, yText, imgProc[i, j]);
+                    xText++;
                 }
+                yText++;
             }
             t.Apply();
 
             return t;
         }
 
-        private Color CalcKernel(Texture2D texture, int x, int y, int level)
+        private Color CalcKernel(int width, int height, int i, int j, int desloc)
         {
             Color px;
             float sumR = 0;
             float sumG = 0;
             float sumB = 0;
-            for (int i = (x - level); i <= (x + level); i++)
+
+            int iMask = 0;
+            int jMask;
+            for (int iImg = (i - desloc); iImg < (i + desloc); iImg++)
             {
-                for (int j = (y - level); j <= (y + level); j++)
+                jMask = 0;
+                for (int jImg = (j - desloc); jImg < (j + desloc); jImg++)
                 {
-                    if (InsideTexture(texture.width, texture.height, i, j))
+                    if (InsideTexture(height, width, iImg, jImg))
                     {
-                        px = texture.GetPixel(i, j);
-                        sumR += (px.r) * mask[i, j];
-                        sumG += (px.g) * mask[i, j];
-                        sumB += (px.b) * mask[i, j];
+                        px = img[iImg, jImg];
+                        sumR += (px.r) * mask[iMask, jMask];
+                        sumG += (px.g) * mask[iMask, jMask];
+                        sumB += (px.b) * mask[iMask, jMask];
                     }
+
+                    jMask++;
                 }
+                iMask++;
             }
 
             minValue.r = sumR < minValue.r ? sumR : minValue.r;
@@ -88,20 +116,23 @@ namespace Scripts.Utils
             maxValue.g = sumG > maxValue.g ? sumG : maxValue.g;
             maxValue.b = sumB > maxValue.b ? sumB : maxValue.b;
 
+            //Debug.Log(sumR +" | "+ sumG +" | "+ sumB);
             return new Color(sumR, sumG, sumB, 1);
         }
         private static bool InsideTexture(int width, int height, int i, int j)
         {
             if (i < 0 || j < 0) return false;
-            if (i >= width || j >= height) return false;
+            if (i >= height || j >= width) return false;
             return true;
         }
 
         private void NormalizeImgProc(int width, int height)
         {
-            for(int i = 0; i < width; i++)
+            Debug.Log(maxValue);
+            Debug.Log(minValue);
+            for(int i = 0; i < height; i++)
             {
-                for(int j = 0; j < height; j++)
+                for(int j = 0; j < width; j++)
                 {
                     imgProc[i, j].r = (imgProc[i, j].r + minValue.r) / maxValue.r;
                     imgProc[i, j].g = (imgProc[i, j].g + minValue.g) / maxValue.g;

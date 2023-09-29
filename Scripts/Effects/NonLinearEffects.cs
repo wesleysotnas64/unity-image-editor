@@ -1,3 +1,4 @@
+using Scripts.Utils;
 using System;
 using UnityEngine;
 
@@ -8,9 +9,27 @@ namespace Scripts.Effects
 
         public static Texture2D Blur(Texture2D inputTexture, int level = 1)
         {
+            //Preparando o filtro de desfoque
+            //int size = (level * 2) + 1;
+            //int qtdPixels = (int) Math.Pow(size, 2);
+            //float[,] filter = new float[size, size];
+
+            //for (int i = 0; i < size; i++)
+            //{
+            //    for(int j = 0; j < size; j++)
+            //    {
+            //        filter[i, j] = (1 / qtdPixels);
+            //    }
+            //}
+
+            //FilterConv fConv = new FilterConv();
+            //fConv.DefFilter(filter, size);
+
+            Texture2D outputTexture = new Texture2D(inputTexture.width, inputTexture.height);
+            //outputTexture = fConv.Conv(inputTexture);
+
             int width = inputTexture.width;
             int height = inputTexture.height;
-            Texture2D outputTexture = new Texture2D(width, height);
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)

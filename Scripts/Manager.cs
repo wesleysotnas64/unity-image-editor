@@ -68,6 +68,15 @@ public class Manager : MonoBehaviour
     public Slider pixelizationPixelSizeSlider;
     public Text pixelizationPixelSizeText;
 
+    [Header("Hitogram Control")]
+    public bool histogramActive;
+    public GameObject histogramPanel;
+    public Histogram histogramObj;
+
+    [Header("Sobel Control")]
+    public bool sobelActive;
+    public GameObject sobelPanel;
+
     private void Start()
     {
         negativeActive = false;
@@ -76,6 +85,10 @@ public class Manager : MonoBehaviour
         gammaActive = false;
         greyScaleActive = false;
         pixelizationActive = false;
+        histogramActive = false;
+        sobelActive = false;
+
+        //histogramObj = new Histogram();
 
         blurMaxLevel = 4;
         gammaMaxLevel = 2.0f;
@@ -108,24 +121,8 @@ public class Manager : MonoBehaviour
 
     public void RenderManager()
     {
-
-        //Chama o efeitos da classe Effects
         SelectEffect();
 
-        //FilterConv filterConv = new FilterConv();
-        //float[,] mask = new float[3,3];
-        //for (int i = 0; i < 3; i++)
-        //{
-        //    for (int j = 0; j < 3; j++)
-        //    {
-        //        mask[i, j] = 1 / 9;
-        //    }
-        //}
-        //Debug.Log(mask);
-        //filterConv.DefFilter(mask, 3);
-        //outputTexture = filterConv.Conv(inputTexture);
-
-        //Renderiza no painel de saída
         RenderOutput();
     }
 
@@ -181,9 +178,43 @@ public class Manager : MonoBehaviour
         {
             outputTexture = LinearEffects.Pixelization(renderTexture, pixelizationPixelSize);
         }
+        else if ( histogramActive )
+        {
+            histogramObj = new Histogram();
+            histogramObj.CalcHistogram(renderTexture);
+            outputTexture = histogramObj.EqualizeHistogram(renderTexture);
+        }
+        else if( sobelActive)
+        {
+            float[,] sobel = new float[3, 3];
+            //sobel[0, 0] = -1;
+            //sobel[0, 1] = 0;
+            //sobel[0, 2] = 1;
+            //sobel[1, 0] = -2;
+            //sobel[1, 1] = 0;
+            //sobel[1, 2] = 2;
+            //sobel[2, 0] = -1;
+            //sobel[2, 1] = 0;
+            //sobel[2, 2] = 1;
+
+            sobel[0, 0] = (1 / 9);
+            sobel[0, 1] = (1 / 9);
+            sobel[0, 2] = (1 / 9);
+            sobel[1, 0] = (1 / 9);
+            sobel[1, 1] = (1 / 9);
+            sobel[1, 2] = (1 / 9);
+            sobel[2, 0] = (1 / 9);
+            sobel[2, 1] = (1 / 9);
+            sobel[2, 2] = (1 / 9);
+
+            FilterConv fConv = new FilterConv();
+            fConv.DefFilter(sobel, 3);
+            outputTexture = fConv.Conv(renderTexture);
+        }
         else
         {
-            outputTexture = renderTexture;
+            //outputTexture = renderTexture;
+            outputTexture = LinearEffects.ColorFromDist(renderTexture);
         }
     }
 
@@ -242,6 +273,8 @@ public class Manager : MonoBehaviour
                     gammaActive = false;
                     greyScaleActive = false;
                     pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
                     break;
 
                 case 1: //Negativo
@@ -251,6 +284,8 @@ public class Manager : MonoBehaviour
                     gammaActive = false;
                     greyScaleActive = false;
                     pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
                     break;
 
                 case 2: // Threshold
@@ -260,6 +295,8 @@ public class Manager : MonoBehaviour
                     gammaActive = false;
                     greyScaleActive = false;
                     pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
                     break;
 
                 case 3: //Blur
@@ -269,6 +306,8 @@ public class Manager : MonoBehaviour
                     gammaActive = false;
                     greyScaleActive = false;
                     pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
                     break;
 
                 case 4: //Gamma Correction
@@ -278,6 +317,8 @@ public class Manager : MonoBehaviour
                     gammaActive = true;
                     greyScaleActive = false;
                     pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
                     break;
 
                 case 5: //Grey Scale
@@ -287,6 +328,8 @@ public class Manager : MonoBehaviour
                     gammaActive = false;
                     greyScaleActive = true;
                     pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
                     break;
 
                 case 6: //Pixelization
@@ -296,6 +339,30 @@ public class Manager : MonoBehaviour
                     gammaActive = false;
                     greyScaleActive = false;
                     pixelizationActive = true;
+                    histogramActive = false;
+                    sobelActive = false;
+                    break;
+
+                case 7: //Histogram
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = true;
+                    sobelActive = false;
+                    break;
+
+                case 8: //Sobel
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = true;
                     break;
 
                 default:
@@ -313,6 +380,8 @@ public class Manager : MonoBehaviour
         gammaPanel.SetActive(gammaActive);
         greyScalePanel.SetActive(greyScaleActive);
         pixelizationPanel.SetActive(pixelizationActive);
+        histogramPanel.SetActive(histogramActive);
+        sobelPanel.SetActive(sobelActive);
         
         if( negativeActive )
         {   
@@ -350,6 +419,14 @@ public class Manager : MonoBehaviour
         {
             pixelizationPixelSize = (int) (pixelizationPixelSizeSlider.value * pixelizationPixelSizeMax);
             pixelizationPixelSizeText.text = pixelizationPixelSize.ToString();
+        }
+        else if ( histogramActive )
+        {
+
+        }
+        else if( sobelActive)
+        {
+
         }
     }
 
