@@ -76,91 +76,8 @@ public class Manager : MonoBehaviour
     [Header("Sobel Control")]
     public bool sobelActive;
     public GameObject sobelPanel;
-
-    public void ApplySobel(int choice){
-        Texture2D renderTexture = effects[currentEffect];
-        if(choice == 1){
-            float[,] sobel = new float[3, 3];
-            sobel[0, 0] = -1;
-            sobel[0, 1] = 0;
-            sobel[0, 2] = 1;
-            sobel[1, 0] = -2;
-            sobel[1, 1] = 0;
-            sobel[1, 2] = 2;
-            sobel[2, 0] = -1;
-            sobel[2, 1] = 0;
-            sobel[2, 2] = 1;
-
-            FilterConv fConv = new FilterConv();
-            fConv.DefFilter(sobel, 3);
-            outputTexture = fConv.Conv(renderTexture);
-            outputTexture.Apply();
-        }
-        else if(choice == 2)
-        {  
-            Debug.Log("entrei");
-            float[,] sobel = new float[3, 3];
-            sobel[0, 0] = -1;
-            sobel[0, 1] = -2;
-            sobel[0, 2] = -1;
-            sobel[1, 0] = 0;
-            sobel[1, 1] = 0;
-            sobel[1, 2] = 0;
-            sobel[2, 0] = 1;
-            sobel[2, 1] = 2;
-            sobel[2, 2] = 1;
-
-            FilterConv fConv = new FilterConv();
-            fConv.DefFilter(sobel, 3);
-            outputTexture = fConv.Conv(renderTexture);
-            outputTexture.Apply();
-        }
-        else
-        {
-            Debug.Log("Não to funcionando ainda porra");
-            float[,] sobelHorizontal = new float[3, 3];
-            sobelHorizontal[0, 0] = -1;
-            sobelHorizontal[0, 1] = -2;
-            sobelHorizontal[0, 2] = -1;
-            sobelHorizontal[1, 0] = 0;
-            sobelHorizontal[1, 1] = 0;
-            sobelHorizontal[1, 2] = 0;
-            sobelHorizontal[2, 0] = 1;
-            sobelHorizontal[2, 1] = 2;
-            sobelHorizontal[2, 2] = 1;
-            float[,] sobelVertical = new float[3, 3];
-            sobelVertical[0, 0] = -1;
-            sobelVertical[0, 1] = -2;
-            sobelVertical[0, 2] = -1;
-            sobelVertical[1, 0] = 0;
-            sobelVertical[1, 1] = 0;
-            sobelVertical[1, 2] = 0;
-            sobelVertical[2, 0] = 1;
-            sobelVertical[2, 1] = 2;
-            sobelVertical[2, 2] = 1;
-
-            FilterConv filterConvVertical = new FilterConv();
-            filterConvVertical.DefFilter(sobelVertical, 3);
-            FilterConv filterConvHorizontal = new FilterConv();
-            filterConvHorizontal.DefFilter(sobelHorizontal, 3);
-            FilterConv filterFinal = new FilterConv();
-            Texture2D vertical = filterConvVertical.Conv(renderTexture);
-            Texture2D horizontal = filterConvHorizontal.Conv(renderTexture);
-            Color[] pixelsVertical = vertical.GetPixels();
-            Color[] pixelsHorizontal = horizontal.GetPixels();
-            Color[] pixelsBorda = new Color[pixelsHorizontal.Length];
-
-            Texture2D saida = new Texture2D(vertical.width, vertical.height);
-            for(int i =0; i < pixelsHorizontal.Length; i++){
-                pixelsBorda[i].r = pixelsVertical[i].r + pixelsHorizontal[i].r;
-                pixelsBorda[i].g = pixelsVertical[i].g + pixelsHorizontal[i].g;
-                pixelsBorda[i].b = pixelsVertical[i].b + pixelsHorizontal[i].b;
-            }
-            saida.SetPixels(pixelsBorda);
-            outputTexture = filterFinal.Finalizador(saida);
-        }
-        RenderOutput();
-    }
+    public Slider normalizerSlider;
+    public int normalizarValue;
 
     private void Start()
     {
@@ -428,7 +345,93 @@ public class Manager : MonoBehaviour
             }
         }
     }
+    public void ApplySobel(int choice){
+        float[,] sobelHorizontal = new float[3, 3];
+            sobelHorizontal[0, 0] = -1;
+            sobelHorizontal[0, 1] = -2;
+            sobelHorizontal[0, 2] = -1;
+            sobelHorizontal[1, 0] = 0;
+            sobelHorizontal[1, 1] = 0;
+            sobelHorizontal[1, 2] = 0;
+            sobelHorizontal[2, 0] = 1;
+            sobelHorizontal[2, 1] = 2;
+            sobelHorizontal[2, 2] = 1;
+        float[,] sobelVertical = new float[3, 3];
+            sobelVertical[0, 0] = -1;
+            sobelVertical[0, 1] = 0;
+            sobelVertical[0, 2] = 1;
+            sobelVertical[1, 0] = -2;
+            sobelVertical[1, 1] = 0;
+            sobelVertical[1, 2] = 2;
+            sobelVertical[2, 0] = -1;
+            sobelVertical[2, 1] = 0;
+            sobelVertical[2, 2] = 1;
 
+        Texture2D renderTexture = effects[currentEffect];
+        if(choice == 1){
+            FilterConv fConv = new FilterConv();
+            fConv.DefFilter(sobelVertical, 3);
+            fConv.setTexture(renderTexture);
+            fConv.SetImg();
+            fConv.ApplyConv();
+            if(normalizarValue == 1){
+                fConv.NormalizeImgProc();
+            }
+            outputTexture = fConv.ReturnImage();
+            outputTexture.Apply();
+        }
+        else if(choice == 2)
+        {  
+            FilterConv fConv = new FilterConv();
+            fConv.DefFilter(sobelHorizontal, 3);
+            fConv.setTexture(renderTexture);
+            fConv.SetImg();
+            fConv.ApplyConv();
+            if(normalizarValue == 1){
+                fConv.NormalizeImgProc();
+            }
+            outputTexture = fConv.ReturnImage();
+            outputTexture.Apply();
+        }
+        else
+        {
+            FilterConv vertical = new FilterConv();
+            FilterConv horizontal = new FilterConv();
+            vertical.DefFilter(sobelVertical, 3);
+            horizontal.DefFilter(sobelHorizontal, 3);
+            vertical.setTexture(renderTexture);
+            vertical.SetImg();
+            vertical.ApplyConv();
+            horizontal.setTexture(renderTexture);
+            horizontal.SetImg();
+            horizontal.ApplyConv();
+
+            Texture2D verticalImage = vertical.ReturnImage();
+            Texture2D horizontalImage = horizontal.ReturnImage();
+            Texture2D bothImage = new Texture2D(renderTexture.width, renderTexture.height);
+            Color[] pixelsVertical = verticalImage.GetPixels();
+            Color[] pixelsHorizontal = horizontalImage.GetPixels();
+            Color[] pixelsFinal = new Color[pixelsVertical.Length];
+            for(int i =0; i< pixelsHorizontal.Length; i++){
+                pixelsFinal[i] = pixelsHorizontal[i] + pixelsVertical[i];
+            }
+            bothImage.SetPixels(pixelsFinal);
+            bothImage.Apply();
+            if(normalizarValue == 1){
+                FilterConv ambos = new FilterConv();
+                ambos.setTexture(bothImage);
+                ambos.SetImg();
+                ambos.PassImage();
+                ambos.NormalizeImgProc();
+                bothImage = ambos.ReturnImage();
+                bothImage.Apply();
+            }
+            outputTexture = bothImage;
+            outputTexture.Apply();
+
+        }
+        RenderOutput();
+    }
     private void PanelManager()
     {
         //Altera visibilidade dos pain�is.
@@ -478,13 +481,9 @@ public class Manager : MonoBehaviour
             pixelizationPixelSize = (int) (pixelizationPixelSizeSlider.value * pixelizationPixelSizeMax);
             pixelizationPixelSizeText.text = pixelizationPixelSize.ToString();
         }
-        else if ( histogramActive )
-        {
-
-        }
-        else if( sobelActive)
-        {
-
+        else if( sobelActive )
+        {   
+            normalizarValue = (int)normalizerSlider.value;
         }
     }
 

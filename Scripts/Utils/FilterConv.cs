@@ -11,7 +11,10 @@ namespace Scripts.Utils
         private Color minValue;
         private Color maxValue;
         private Color[,] imgProc;
+        private int height;
+        private int width;
         private Color[,] img;
+        private Texture2D texture;
 
         public FilterConv()
         {
@@ -19,45 +22,15 @@ namespace Scripts.Utils
             maxValue = new Color(-99999, -99999, -99999, 1);
         }
 
-        public void DefFilter(float[,] mask, int sizeMask)
-        {
-            this.sizeMask = sizeMask;
-            this.mask = new float[sizeMask, sizeMask];
-            this.mask = mask;
-        }
-        public Texture2D Finalizador(Texture2D texture){
-            imgProc = new Color[texture.height, texture.width];
+
+        public Texture2D ReturnImage(){
+            Texture2D final = new Texture2D(this.width, this.height);
             int xText;
             int yText = 0;
-            for (int i = 0; i < texture.height; i++)
+            for (int i = 0; i < this.height; i++)
             {
                 xText = 0;
-                for (int j = 0; j < texture.width; j++)
-                {
-                    imgProc[i, j] = texture.GetPixel(xText, yText);
-                    xText++;
-                }
-                yText++;
-            }
-            for(int i = 0; i < texture.height;i++){
-                for(int j = 0; j < texture.width; j++)
-                {
-                    minValue.r = imgProc[i,j].r < minValue.r ? imgProc[i,j].r : minValue.r;
-                    minValue.g = imgProc[i,j].g < minValue.g ? imgProc[i,j].g : minValue.g;
-                    minValue.b = imgProc[i,j].b < minValue.b ? imgProc[i,j].b : minValue.b;
-                }
-            }
-            NormalizeImgProc(texture.width, texture.height);
-            return SetarPixels(texture);
-        }
-        private Texture2D SetarPixels(Texture2D texture){
-            Texture2D final = new Texture2D(texture.width, texture.height);
-            int xText;
-            int yText = 0;
-            for (int i = 0; i < texture.height; i++)
-            {
-                xText = 0;
-                for (int j = 0; j < texture.width; j++)
+                for (int j = 0; j < this.width; j++)
                 {
                     final.SetPixel(xText, yText, imgProc[i, j]);
                     xText++;
@@ -65,52 +38,6 @@ namespace Scripts.Utils
                 yText++;
             }
             return final;
-        }
-        public Texture2D Conv(Texture2D texture)
-        {
-            int desloc = (sizeMask - 1) / 2;
-            Debug.Log(desloc);
-            imgProc = new Color[texture.height, texture.width];
-            img = new Color[texture.height, texture.width];
-
-            int xText;
-            int yText = 0;
-            for (int i = 0; i < texture.height; i++)
-            {
-                xText = 0;
-                for (int j = 0; j < texture.width; j++)
-                {
-                    img[i, j] = texture.GetPixel(xText, yText);
-                    xText++;
-                }
-                yText++;
-            }
-
-            for (int i = 0; i < texture.height; i++)
-            {
-                for (int j = 0; j < texture.width; j++)
-                {
-                    imgProc[i, j] = CalcKernel(texture.width, texture.height, i, j, desloc);
-                }
-            }
-
-            NormalizeImgProc(texture.width, texture.height);
-            Debug.Log(minValue);
-            Debug.Log(maxValue);
-            Texture2D t = new Texture2D(texture.width, texture.height);
-            
-            yText = 0;
-            for (int i = 0; i < texture.height; i++)
-            {
-                xText = 0;
-                for (int j = 0; j < texture.width; j++)
-                {
-                    t.SetPixel(xText, yText, imgProc[i, j]);
-                    xText++;
-                }
-                yText++;
-            }
-            return t;
         }
 
         private Color CalcKernel(int width, int height, int i, int j, int desloc)
@@ -152,11 +79,11 @@ namespace Scripts.Utils
             return true;
         }
 
-        public void NormalizeImgProc(int width, int height)
+        public void NormalizeImgProc()
         {
-            for(int i = 0; i < height; i++)
+            for(int i = 0; i < this.height; i++)
             {
-                for(int j = 0; j < width; j++)
+                for(int j = 0; j < this.width; j++)
                 {
                     imgProc[i, j].r = imgProc[i, j].r - (float)minValue.r;
                     imgProc[i, j].g = imgProc[i, j].g - (float)minValue.g;
@@ -166,16 +93,70 @@ namespace Scripts.Utils
                     maxValue.b = imgProc[i, j].b > maxValue.b ? imgProc[i, j].b : maxValue.b;
                 }
             }
-            Debug.Log(maxValue);
-            for(int i = 0; i < height; i++)
+            for(int i = 0; i < this.height; i++)
             {
-                for(int j = 0; j < width; j++)
+                for(int j = 0; j < this.width; j++)
                 {
                     imgProc[i, j].r = imgProc[i, j].r / maxValue.r;
                     imgProc[i, j].g = imgProc[i, j].g / maxValue.g;
                     imgProc[i, j].b = imgProc[i, j].b / maxValue.b;
                 }
             }
+        }
+        public void PassImage(){
+            imgProc = new Color[this.height, this.width];
+            for (int i = 0; i < this.height; i++)
+            {
+                for (int j = 0; j < this.width; j++)
+                {
+                    imgProc[i, j] = img[i, j];
+
+                    minValue.r = imgProc[i, j].r < minValue.r ? imgProc[i, j].r : minValue.r;
+                    minValue.g = imgProc[i, j].g < minValue.g ? imgProc[i, j].g : minValue.g;
+                    minValue.b = imgProc[i, j].b < minValue.b ? imgProc[i, j].b : minValue.b;
+                }
+            }
+        }
+        public void ApplyConv()
+        {
+            int desloc = (sizeMask - 1) / 2;
+            imgProc = new Color[this.height, this.width];
+            for (int i = 0; i < this.height; i++)
+            {
+                for (int j = 0; j < this.width; j++)
+                {
+                    imgProc[i, j] = CalcKernel(this.width, this.height, i, j, desloc);
+                }
+            }
+        }
+
+        public void setTexture(Texture2D texture){
+            this.width = texture.width;
+            this.height = texture.height;
+            this.texture = texture;
+        }
+
+        public void SetImg(){
+            img = new Color[this.height, this.width];
+            int xText;
+            int yText = 0;
+            for (int i = 0; i < this.height; i++)
+            {
+                xText = 0;
+                for (int j = 0; j < this.width; j++)
+                {
+                    img[i, j] = this.texture.GetPixel(xText, yText);
+                    xText++;
+                }
+                yText++;
+            }
+        }
+
+        public void DefFilter(float[,] mask, int sizeMask)
+        {
+            this.sizeMask = sizeMask;
+            this.mask = new float[sizeMask, sizeMask];
+            this.mask = mask;
         }
     }
 
