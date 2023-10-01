@@ -37,6 +37,7 @@ namespace Scripts.Utils
                 }
                 yText++;
             }
+            final.Apply();
             return final;
         }
 
@@ -103,13 +104,14 @@ namespace Scripts.Utils
                 }
             }
         }
-        public void PassImage(){
+
+        public void PassImage(Color[,] image){
             imgProc = new Color[this.height, this.width];
             for (int i = 0; i < this.height; i++)
             {
                 for (int j = 0; j < this.width; j++)
                 {
-                    imgProc[i, j] = img[i, j];
+                    imgProc[i, j] = image[i, j];
 
                     minValue.r = imgProc[i, j].r < minValue.r ? imgProc[i, j].r : minValue.r;
                     minValue.g = imgProc[i, j].g < minValue.g ? imgProc[i, j].g : minValue.g;
@@ -117,6 +119,10 @@ namespace Scripts.Utils
                 }
             }
         }
+        public Color[,] getImgProc(){
+            return this.imgProc;
+        }
+        
         public void ApplyConv()
         {
             int desloc = (sizeMask - 1) / 2;
@@ -129,14 +135,10 @@ namespace Scripts.Utils
                 }
             }
         }
-
-        public void setTexture(Texture2D texture){
+        public void SetImg(Texture2D texture){
             this.width = texture.width;
             this.height = texture.height;
             this.texture = texture;
-        }
-
-        public void SetImg(){
             img = new Color[this.height, this.width];
             int xText;
             int yText = 0;

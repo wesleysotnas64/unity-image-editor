@@ -77,7 +77,8 @@ public class Manager : MonoBehaviour
     public bool sobelActive;
     public GameObject sobelPanel;
     public Slider normalizerSlider;
-    public int normalizarValue;
+    public int normalizerValue;
+    public int sobelValue;
 
     private void Start()
     {
@@ -185,6 +186,10 @@ public class Manager : MonoBehaviour
             histogramObj = new Histogram();
             histogramObj.CalcHistogram(renderTexture);
             outputTexture = histogramObj.EqualizeHistogram(renderTexture);
+        }
+        else if ( sobelActive )
+        {
+            outputTexture = NonLinearEffects.Sobel(renderTexture, sobelValue, normalizerValue);
         }
         else
         {
@@ -345,92 +350,8 @@ public class Manager : MonoBehaviour
             }
         }
     }
-    public void ApplySobel(int choice){
-        float[,] sobelHorizontal = new float[3, 3];
-            sobelHorizontal[0, 0] = -1;
-            sobelHorizontal[0, 1] = -2;
-            sobelHorizontal[0, 2] = -1;
-            sobelHorizontal[1, 0] = 0;
-            sobelHorizontal[1, 1] = 0;
-            sobelHorizontal[1, 2] = 0;
-            sobelHorizontal[2, 0] = 1;
-            sobelHorizontal[2, 1] = 2;
-            sobelHorizontal[2, 2] = 1;
-        float[,] sobelVertical = new float[3, 3];
-            sobelVertical[0, 0] = -1;
-            sobelVertical[0, 1] = 0;
-            sobelVertical[0, 2] = 1;
-            sobelVertical[1, 0] = -2;
-            sobelVertical[1, 1] = 0;
-            sobelVertical[1, 2] = 2;
-            sobelVertical[2, 0] = -1;
-            sobelVertical[2, 1] = 0;
-            sobelVertical[2, 2] = 1;
-
-        Texture2D renderTexture = effects[currentEffect];
-        if(choice == 1){
-            FilterConv fConv = new FilterConv();
-            fConv.DefFilter(sobelVertical, 3);
-            fConv.setTexture(renderTexture);
-            fConv.SetImg();
-            fConv.ApplyConv();
-            if(normalizarValue == 1){
-                fConv.NormalizeImgProc();
-            }
-            outputTexture = fConv.ReturnImage();
-            outputTexture.Apply();
-        }
-        else if(choice == 2)
-        {  
-            FilterConv fConv = new FilterConv();
-            fConv.DefFilter(sobelHorizontal, 3);
-            fConv.setTexture(renderTexture);
-            fConv.SetImg();
-            fConv.ApplyConv();
-            if(normalizarValue == 1){
-                fConv.NormalizeImgProc();
-            }
-            outputTexture = fConv.ReturnImage();
-            outputTexture.Apply();
-        }
-        else
-        {
-            FilterConv vertical = new FilterConv();
-            FilterConv horizontal = new FilterConv();
-            vertical.DefFilter(sobelVertical, 3);
-            horizontal.DefFilter(sobelHorizontal, 3);
-            vertical.setTexture(renderTexture);
-            vertical.SetImg();
-            vertical.ApplyConv();
-            horizontal.setTexture(renderTexture);
-            horizontal.SetImg();
-            horizontal.ApplyConv();
-
-            Texture2D verticalImage = vertical.ReturnImage();
-            Texture2D horizontalImage = horizontal.ReturnImage();
-            Texture2D bothImage = new Texture2D(renderTexture.width, renderTexture.height);
-            Color[] pixelsVertical = verticalImage.GetPixels();
-            Color[] pixelsHorizontal = horizontalImage.GetPixels();
-            Color[] pixelsFinal = new Color[pixelsVertical.Length];
-            for(int i =0; i< pixelsHorizontal.Length; i++){
-                pixelsFinal[i] = pixelsHorizontal[i] + pixelsVertical[i];
-            }
-            bothImage.SetPixels(pixelsFinal);
-            bothImage.Apply();
-            if(normalizarValue == 1){
-                FilterConv ambos = new FilterConv();
-                ambos.setTexture(bothImage);
-                ambos.SetImg();
-                ambos.PassImage();
-                ambos.NormalizeImgProc();
-                bothImage = ambos.ReturnImage();
-                bothImage.Apply();
-            }
-            outputTexture = bothImage;
-            outputTexture.Apply();
-
-        }
-        RenderOutput();
+    public void SetValue(int valueSet){
+            sobelValue = valueSet; 
     }
     private void PanelManager()
     {
@@ -483,7 +404,7 @@ public class Manager : MonoBehaviour
         }
         else if( sobelActive )
         {   
-            normalizarValue = (int)normalizerSlider.value;
+            normalizerValue = (int)normalizerSlider.value;
         }
     }
 
