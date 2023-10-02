@@ -102,7 +102,7 @@ namespace Scripts.Effects
 
         }
 
-        public static Texture2D Threshold(Texture2D inputTexture, float k)
+        public static Texture2D Threshold(Texture2D inputTexture, float r, float g, float b)
         {
             Color[] pixels = inputTexture.GetPixels();
 
@@ -112,16 +112,28 @@ namespace Scripts.Effects
                 float redThreshold;
                 float greenThreshold;
                 float blueThreshold;
-                if (pixels[i].r < k)
+                if (pixels[i].r < r)
                 {
                     redThreshold = 0;
-                    greenThreshold = 0;
-                    blueThreshold = 0;
                 }
                 else
                 {
                     redThreshold = 1;
+                }
+                if (pixels[i].g < g)
+                {
+                    greenThreshold = 0;
+                }
+                else
+                {
                     greenThreshold = 1;
+                }
+                if (pixels[i].b < b)
+                {
+                    blueThreshold = 0;
+                }
+                else
+                {
                     blueThreshold = 1;
                 }
 
@@ -153,6 +165,28 @@ namespace Scripts.Effects
                 }
             }
 
+            outputTexture.Apply();
+
+            return outputTexture;
+        }
+        public static Texture2D ColorFragmentation(Texture2D inputTexture, int r, int g, int b, int limit, Color32 baseColor)
+        {
+            Color32[] pixels = inputTexture.GetPixels32();
+
+            Color32[] fragmentationPixels = new Color32[pixels.Length];
+            Debug.Log(baseColor);
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                int distance = (int)Math.Sqrt(Math.Pow(pixels[i].r-r,2)+Math.Pow(pixels[i].g-g,2)+Math.Pow(pixels[i].b-b,2));
+                if(distance <=limit){
+                    fragmentationPixels[i] = pixels[i];
+                }else{
+                    fragmentationPixels[i] = baseColor; 
+                }
+            }
+
+            Texture2D outputTexture = new Texture2D(inputTexture.width, inputTexture.height);
+            outputTexture.SetPixels32(fragmentationPixels);
             outputTexture.Apply();
 
             return outputTexture;

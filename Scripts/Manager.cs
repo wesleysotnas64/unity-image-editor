@@ -25,10 +25,19 @@ public class Manager : MonoBehaviour
 
     [Header("Threshold Control")]
     public bool thresholdActive;
-    public float thresholdLevel;
+    public float rgbLevel;
+    public float rLevel;
+    public float gLevel;
+    public float bLevel;
     public GameObject thresholdPanel;
-    public Slider thresholdSliderLevel;
-    public Text thresholdTextLevel;
+    public Slider rgbSliderLevel;
+    public Text rgbTextLevel;
+    public Slider rSliderLevel;
+    public Text rTextLevel;
+    public Slider gSliderLevel;
+    public Text gTextLevel;
+    public Slider bSliderLevel;
+    public Text bTextLevel;
 
     [Header("Blur Control")]
     public bool blurActive;
@@ -79,12 +88,46 @@ public class Manager : MonoBehaviour
     public Slider normalizerSlider;
     public int normalizerValue;
     public int sobelValue;
+
     [Header("Generic FIlter Control")]
     public bool genericActive;
     public GameObject genericFilterPanel;
     public int[,] genericMask = new int[10,10];
     int quantity = 0;
     int sizeGenericMask = 3;
+
+    [Header("Color fragmentation")]
+    public bool colorFragmentationActive;
+    public int limit;
+    public int colorRLevel;
+    public int colorGLevel;
+    public int colorBLevel;
+    public Color32 colorbase;
+    public GameObject colorFragmentationPanel;
+    public Slider limitSlider;
+    public Text limitTextLevel;
+    public Slider rColorSliderLevel;
+    public Text rColorTextLevel;
+    public Slider gColorSliderLevel;
+    public Text gColorTextLevel;
+    public Slider bColorSliderLevel;
+    public Text bColorTextLevel;
+
+    [Header("Chrome key")]
+    public bool chromaKeyActive;
+    public int chromaRLevel;
+    public int chromaGLevel;
+    public int chromaBLevel;
+    public Texture2D imgBase;
+    public GameObject chromaKeyFragmentationPanel;
+    public Slider chromaLimitSlider;
+    public Text chromaLimitTextLevel;
+    public Slider rChromaSliderLevel;
+    public Text rChromaTextLevel;
+    public Slider gChromaSliderLevel;
+    public Text gChromaTextLevel;
+    public Slider bChromaSliderLevel;
+    public Text bChromaTextLevel;
 
     private void Start()
     {
@@ -96,6 +139,7 @@ public class Manager : MonoBehaviour
         pixelizationActive = false;
         histogramActive = false;
         sobelActive = false;
+        colorFragmentationActive = false;
 
         //histogramObj = new Histogram();
 
@@ -136,6 +180,7 @@ public class Manager : MonoBehaviour
             Debug.Log("Num vo aguentar mais...tira...tira caraio");
         }
     }
+
     public void DefineSize(int size){
         sizeGenericMask = size;
     }
@@ -181,7 +226,7 @@ public class Manager : MonoBehaviour
         }
         else if (thresholdActive)
         {
-            outputTexture = LinearEffects.Threshold(renderTexture, thresholdLevel);
+            outputTexture = LinearEffects.Threshold(renderTexture, rLevel,gLevel,bLevel);
         }
         else if (blurActive)
         {
@@ -219,6 +264,10 @@ public class Manager : MonoBehaviour
             }
             outputTexture = NonLinearEffects.GenericFilter(mask,sizeGenericMask, renderTexture);
             quantity = 0;
+        }
+        else if ( colorFragmentationActive )
+        {
+            outputTexture = LinearEffects.ColorFragmentation(renderTexture,colorRLevel,colorGLevel,colorBLevel, limit, colorbase);
         }
         else
         {
@@ -284,6 +333,8 @@ public class Manager : MonoBehaviour
                     pixelizationActive = false;
                     histogramActive = false;
                     sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
                     break;
 
                 case 1: //Negativo
@@ -295,6 +346,8 @@ public class Manager : MonoBehaviour
                     pixelizationActive = false;
                     histogramActive = false;
                     sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
                     break;
 
                 case 2: // Threshold
@@ -306,6 +359,8 @@ public class Manager : MonoBehaviour
                     pixelizationActive = false;
                     histogramActive = false;
                     sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
                     break;
 
                 case 3: //Blur
@@ -317,6 +372,8 @@ public class Manager : MonoBehaviour
                     pixelizationActive = false;
                     histogramActive = false;
                     sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
                     break;
 
                 case 4: //Gamma Correction
@@ -328,6 +385,8 @@ public class Manager : MonoBehaviour
                     pixelizationActive = false;
                     histogramActive = false;
                     sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
                     break;
 
                 case 5: //Grey Scale
@@ -339,6 +398,8 @@ public class Manager : MonoBehaviour
                     pixelizationActive = false;
                     histogramActive = false;
                     sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
                     break;
 
                 case 6: //Pixelization
@@ -350,6 +411,8 @@ public class Manager : MonoBehaviour
                     pixelizationActive = true;
                     histogramActive = false;
                     sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
                     break;
 
                 case 7: //Histogram
@@ -361,6 +424,8 @@ public class Manager : MonoBehaviour
                     pixelizationActive = false;
                     histogramActive = true;
                     sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
                     break;
 
                 case 8: //Sobel
@@ -372,6 +437,8 @@ public class Manager : MonoBehaviour
                     pixelizationActive = false;
                     histogramActive = false;
                     sobelActive = true;
+                    genericActive = false;
+                    colorFragmentationActive = false;
                     break;
                 case 9: //Generic Filter
                     negativeActive = false;
@@ -383,12 +450,48 @@ public class Manager : MonoBehaviour
                     histogramActive = false;
                     sobelActive = false;
                     genericActive = true;
+                    colorFragmentationActive = false;
+                    break;
+                case 10: //Color Fragmentation
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = true;
                     break;
 
                 default:
                     break;
             }
         }
+    }
+    public void RgbManager(){
+        rSliderLevel.value = rgbSliderLevel.value;
+        gSliderLevel.value = rgbSliderLevel.value;
+        bSliderLevel.value = rgbSliderLevel.value;
+        rgbTextLevel.text = rgbSliderLevel.value.ToString();
+        PanelManager();
+    }
+    public void changeColorBase(int type){
+        if(type == 0){
+            colorbase.r = 0;
+            colorbase.g = 0;
+            colorbase.b = 0;
+        }else if(type== 1){
+            colorbase.r = 128;
+            colorbase.g = 128;
+            colorbase.b = 128;
+        }else if(type == 2){
+            colorbase.r = 255;
+            colorbase.g = 255;
+            colorbase.b = 255;
+        }
+        colorbase.a = 255;
     }
     public void SetValue(int valueSet){
             sobelValue = valueSet; 
@@ -405,14 +508,19 @@ public class Manager : MonoBehaviour
         histogramPanel.SetActive(histogramActive);
         sobelPanel.SetActive(sobelActive);
         genericFilterPanel.SetActive(genericActive);
+        colorFragmentationPanel.SetActive(colorFragmentationActive);
         
         if( negativeActive )
         {   
         }
         else if( thresholdActive)
         {
-            thresholdLevel = thresholdSliderLevel.value;
-            thresholdTextLevel.text = thresholdLevel.ToString();
+            rLevel = rSliderLevel.value;
+            rTextLevel.text = rLevel.ToString();
+            gLevel = gSliderLevel.value;
+            gTextLevel.text = gLevel.ToString();
+            bLevel = bSliderLevel.value;
+            bTextLevel.text = bLevel.ToString();
         }
         else if( blurActive )
         {
@@ -446,6 +554,17 @@ public class Manager : MonoBehaviour
         else if( sobelActive )
         {   
             normalizerValue = (int)normalizerSlider.value;
+        }
+        else if( colorFragmentationActive )
+        {   
+            colorRLevel = (int)rColorSliderLevel.value;
+            rColorTextLevel.text = colorRLevel.ToString();
+            colorGLevel = (int)gColorSliderLevel.value;
+            gColorTextLevel.text = colorGLevel.ToString();
+            colorBLevel = (int)bColorSliderLevel.value;
+            bColorTextLevel.text = colorBLevel.ToString();
+            limit = (int)limitSlider.value;
+            limitTextLevel.text = limit.ToString();
         }
     }
 
