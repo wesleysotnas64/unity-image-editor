@@ -7,6 +7,16 @@ namespace Scripts.Effects
 {
     static class NonLinearEffects
     {
+
+        public static Texture2D GenericFilter(float[,]mask,int size, Texture2D inputTexture){
+            FilterConv generic = new FilterConv();
+            generic.DefFilter(mask, size);
+            generic.SetImg(inputTexture);
+            generic.ApplyConv();
+            Texture2D outputTexture = generic.ReturnImage();
+            outputTexture.Apply();
+            return outputTexture;
+        }
         public static Texture2D Sobel(Texture2D inputTexture, int type, int normalize){
             Texture2D outputTexture = new Texture2D(inputTexture.width, inputTexture.height);
             float[,] sobelHorizontal = new float[3, 3];

@@ -79,6 +79,12 @@ public class Manager : MonoBehaviour
     public Slider normalizerSlider;
     public int normalizerValue;
     public int sobelValue;
+    [Header("Generic FIlter Control")]
+    public bool genericActive;
+    public GameObject genericFilterPanel;
+    public int[,] genericMask = new int[10,10];
+    int quantity = 0;
+    int sizeGenericMask = 3;
 
     private void Start()
     {
@@ -120,6 +126,19 @@ public class Manager : MonoBehaviour
         UpdatePanels();
     }
 
+    public void AddValue(int value){
+        if(quantity < sizeGenericMask*sizeGenericMask){
+            int line = quantity/sizeGenericMask;
+            int column = quantity / sizeGenericMask;
+            genericMask[line,column] = value;
+            quantity += 1;
+        }else{
+            Debug.Log("Num vo aguentar mais...tira...tira caraio");
+        }
+    }
+    public void DefineSize(int size){
+        sizeGenericMask = size;
+    }
 
 
     public void RenderManager()
@@ -128,7 +147,6 @@ public class Manager : MonoBehaviour
 
         RenderOutput();
     }
-
     private void RenderInput()
     {
         if(inputRender != null)
@@ -190,6 +208,17 @@ public class Manager : MonoBehaviour
         else if ( sobelActive )
         {
             outputTexture = NonLinearEffects.Sobel(renderTexture, sobelValue, normalizerValue);
+        }
+        else if ( genericActive )
+        {
+            float[, ] mask = new float[sizeGenericMask, sizeGenericMask];
+            for(int i = 0; i< sizeGenericMask; i++){
+                for(int j = 0; j < sizeGenericMask; j++){
+                    mask[i,j] = (float)genericMask[i,j];                    
+                }
+            }
+            outputTexture = NonLinearEffects.GenericFilter(mask,sizeGenericMask, renderTexture);
+            quantity = 0;
         }
         else
         {
@@ -344,6 +373,17 @@ public class Manager : MonoBehaviour
                     histogramActive = false;
                     sobelActive = true;
                     break;
+                case 9: //Generic Filter
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = true;
+                    break;
 
                 default:
                     break;
@@ -364,6 +404,7 @@ public class Manager : MonoBehaviour
         pixelizationPanel.SetActive(pixelizationActive);
         histogramPanel.SetActive(histogramActive);
         sobelPanel.SetActive(sobelActive);
+        genericFilterPanel.SetActive(genericActive);
         
         if( negativeActive )
         {   
