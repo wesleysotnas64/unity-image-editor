@@ -191,6 +191,40 @@ namespace Scripts.Effects
 
             return outputTexture;
         }
+        public static Texture2D ChromaKey(Texture2D inputTexture, int r, int g, int b, int limit, Texture2D baseImg)
+        {
+
+            Color32[,] fragmentationPixels = new Color32[inputTexture.height, inputTexture.width];
+            int xText;
+            int yText = 0;
+            for (int i = 0; i < inputTexture.height; i++)
+            {
+                xText = 0;
+                for(int j = 0; j< inputTexture.width;j++){
+                    int distance = (int)Math.Sqrt(Math.Pow((inputTexture.GetPixel(xText,yText).r*255)-r,2)+Math.Pow((inputTexture.GetPixel(xText,yText).g*255)-g,2)+Math.Pow((inputTexture.GetPixel(xText,yText).b*255)-b,2));
+                    if(distance <= limit){
+                        fragmentationPixels[i,j] = inputTexture.GetPixel(xText,yText);
+                    }else{
+                        fragmentationPixels[i,j] = baseImg.GetPixel(xText, yText); 
+                    }
+                    xText++;
+                }
+                yText++;
+            }
+
+            Texture2D outputTexture = new Texture2D(inputTexture.width, inputTexture.height);
+            for (int i = 0; i < inputTexture.height; i++)
+            {
+                xText = 0;
+                for(int j = 0; j< inputTexture.width;j++){
+                    outputTexture.SetPixel(xText,yText, fragmentationPixels[i,j]);
+                    xText++;
+                }
+                yText++;
+            }
+            outputTexture.Apply();
+            return outputTexture;
+        }
 
     }
 

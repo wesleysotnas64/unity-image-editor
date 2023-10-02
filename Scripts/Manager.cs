@@ -115,11 +115,12 @@ public class Manager : MonoBehaviour
 
     [Header("Chrome key")]
     public bool chromaKeyActive;
+    public int chromaLimit;
     public int chromaRLevel;
     public int chromaGLevel;
     public int chromaBLevel;
     public Texture2D imgBase;
-    public GameObject chromaKeyFragmentationPanel;
+    public GameObject chromaKeyPanel;
     public Slider chromaLimitSlider;
     public Text chromaLimitTextLevel;
     public Slider rChromaSliderLevel;
@@ -128,6 +129,7 @@ public class Manager : MonoBehaviour
     public Text gChromaTextLevel;
     public Slider bChromaSliderLevel;
     public Text bChromaTextLevel;
+    public Image inputKey;
 
     private void Start()
     {
@@ -194,6 +196,7 @@ public class Manager : MonoBehaviour
     }
     private void RenderInput()
     {
+
         if(inputRender != null)
         {
             Texture2D renderTexture = effects[currentEffect];
@@ -269,6 +272,10 @@ public class Manager : MonoBehaviour
         {
             outputTexture = LinearEffects.ColorFragmentation(renderTexture,colorRLevel,colorGLevel,colorBLevel, limit, colorbase);
         }
+        else if ( chromaKeyActive )
+        {
+            outputTexture = LinearEffects.ChromaKey(renderTexture,chromaRLevel,chromaGLevel,chromaBLevel, chromaLimit, imgBase);
+        }
         else
         {
             //outputTexture = renderTexture;
@@ -335,6 +342,7 @@ public class Manager : MonoBehaviour
                     sobelActive = false;
                     genericActive = false;
                     colorFragmentationActive = false;
+                    chromaKeyActive = false;
                     break;
 
                 case 1: //Negativo
@@ -348,6 +356,7 @@ public class Manager : MonoBehaviour
                     sobelActive = false;
                     genericActive = false;
                     colorFragmentationActive = false;
+                    chromaKeyActive = false;
                     break;
 
                 case 2: // Threshold
@@ -361,6 +370,7 @@ public class Manager : MonoBehaviour
                     sobelActive = false;
                     genericActive = false;
                     colorFragmentationActive = false;
+                    chromaKeyActive = false;
                     break;
 
                 case 3: //Blur
@@ -374,6 +384,7 @@ public class Manager : MonoBehaviour
                     sobelActive = false;
                     genericActive = false;
                     colorFragmentationActive = false;
+                    chromaKeyActive = false;
                     break;
 
                 case 4: //Gamma Correction
@@ -387,6 +398,7 @@ public class Manager : MonoBehaviour
                     sobelActive = false;
                     genericActive = false;
                     colorFragmentationActive = false;
+                    chromaKeyActive = false;
                     break;
 
                 case 5: //Grey Scale
@@ -400,6 +412,7 @@ public class Manager : MonoBehaviour
                     sobelActive = false;
                     genericActive = false;
                     colorFragmentationActive = false;
+                    chromaKeyActive = false;
                     break;
 
                 case 6: //Pixelization
@@ -413,6 +426,7 @@ public class Manager : MonoBehaviour
                     sobelActive = false;
                     genericActive = false;
                     colorFragmentationActive = false;
+                    chromaKeyActive = false;
                     break;
 
                 case 7: //Histogram
@@ -426,6 +440,7 @@ public class Manager : MonoBehaviour
                     sobelActive = false;
                     genericActive = false;
                     colorFragmentationActive = false;
+                    chromaKeyActive = false;
                     break;
 
                 case 8: //Sobel
@@ -439,6 +454,7 @@ public class Manager : MonoBehaviour
                     sobelActive = true;
                     genericActive = false;
                     colorFragmentationActive = false;
+                    chromaKeyActive = false;
                     break;
                 case 9: //Generic Filter
                     negativeActive = false;
@@ -451,6 +467,7 @@ public class Manager : MonoBehaviour
                     sobelActive = false;
                     genericActive = true;
                     colorFragmentationActive = false;
+                    chromaKeyActive = false;
                     break;
                 case 10: //Color Fragmentation
                     negativeActive = false;
@@ -463,6 +480,20 @@ public class Manager : MonoBehaviour
                     sobelActive = false;
                     genericActive = false;
                     colorFragmentationActive = true;
+                    chromaKeyActive = false;
+                    break;
+                case 11: //Chroma key
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = true;
                     break;
 
                 default:
@@ -509,6 +540,7 @@ public class Manager : MonoBehaviour
         sobelPanel.SetActive(sobelActive);
         genericFilterPanel.SetActive(genericActive);
         colorFragmentationPanel.SetActive(colorFragmentationActive);
+        chromaKeyPanel.SetActive(chromaKeyActive);
         
         if( negativeActive )
         {   
@@ -565,6 +597,16 @@ public class Manager : MonoBehaviour
             bColorTextLevel.text = colorBLevel.ToString();
             limit = (int)limitSlider.value;
             limitTextLevel.text = limit.ToString();
+        }else if(chromaKeyActive){
+            chromaRLevel = (int)rChromaSliderLevel.value;
+            rChromaTextLevel.text = chromaRLevel.ToString();
+            chromaGLevel = (int)gChromaSliderLevel.value;
+            gChromaTextLevel.text = chromaGLevel.ToString();
+            chromaBLevel = (int)bChromaSliderLevel.value;
+            bChromaTextLevel.text = chromaBLevel.ToString();
+            chromaLimit = (int)chromaLimitSlider.value;
+            chromaLimitTextLevel.text = chromaLimit.ToString();
+
         }
     }
 
