@@ -226,6 +226,24 @@ namespace Scripts.Effects
             return outputTexture;
         }
 
+        public static Texture2D ApplyHsv(Texture2D inputTexture, int h, float s, float v){
+            Color[] pixels = inputTexture.GetPixels();
+            Color[] saida = new Color[pixels.Length];
+            for(int i =0; i < pixels.Length; i++){
+                float somaRed = (255 - (pixels[i].r*255))*s;
+                float somaGreen = (255 - (pixels[i].g*255))*s;
+                float somaBlue = (255 - (pixels[i].b*255))*s;
+                float redColor = (somaRed + pixels[i].r*255)*v;
+                float greenColor = (somaGreen + pixels[i].g*255)*v;
+                float blueColor = (somaBlue + pixels[i].b*255)*v;
+                saida[i] = new Color(redColor/255, greenColor/255, blueColor/255, pixels[i].a);
+            }
+            Texture2D outputTexture = new Texture2D(inputTexture.width, inputTexture.height);
+            outputTexture.SetPixels(saida);
+            outputTexture.Apply();
+            return outputTexture;
+        }
+
     }
 
 }
