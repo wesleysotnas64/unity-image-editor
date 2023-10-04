@@ -229,7 +229,60 @@ namespace Scripts.Effects
         public static Texture2D ApplyHsv(Texture2D inputTexture, int h, float s, float v){
             Color[] pixels = inputTexture.GetPixels();
             Color[] saida = new Color[pixels.Length];
+            double somadorRed = 0;
+            double somadorGreen = 1.125;
+            double somadorBlue = 0;
+            double[] valor = new double[3];
+            valor[0] = 255;
+            valor[1] = 0;
+            valor[2] = 0; 
+            for(int i = 0; i <= h;i++){
+                if(i == 61){
+                    somadorGreen = 1.125;
+                    somadorRed = -2.25;
+                    somadorBlue = 0;
+                }else if(i == 121){
+                    somadorBlue = 1.125;
+                    somadorGreen = 0;
+                    somadorRed = 0;
+                }
+                else if(i == 181){
+                    somadorBlue = 1.125;
+                    somadorGreen = -2.25;
+                    somadorRed = 0;
+                }
+                else if(i == 241){
+                    somadorBlue = 0;
+                    somadorGreen = 0;
+                    somadorRed= 1.125;
+                }else if(i == 301){
+                    somadorBlue = -2.25;
+                    somadorGreen = 0;
+                    somadorRed = 1.125;
+                }
+                valor[0] += somadorRed;
+                valor[1] += somadorGreen; 
+                valor[2] += somadorBlue;
+            }
+            valor[0] = 255 - valor[0];
+            valor[1] = 255 - valor[1];
+            valor[2] = 255 - valor[2];
             for(int i =0; i < pixels.Length; i++){
+                if(pixels[i].r*255 > valor[0]){
+                    pixels[i].r = 1;
+                }else{
+                    pixels[i].r = 0;
+                }
+                if(pixels[i].g*255 > valor[1]){
+                    pixels[i].g = 1;
+                }else{
+                    pixels[i].g = 0;
+                }
+                if(pixels[i].b*255 > valor[2]){
+                    pixels[i].b = 1;
+                }else{
+                    pixels[i].b = 0;
+                }
                 float somaRed = (255 - (pixels[i].r*255))*s;
                 float somaGreen = (255 - (pixels[i].g*255))*s;
                 float somaBlue = (255 - (pixels[i].b*255))*s;

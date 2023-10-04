@@ -5,6 +5,11 @@ using Scripts.Utils;
 using System.Collections.Generic;
 using UnityEngine.Windows;
 using UnityEngine.UIElements.Experimental;
+using UnityEngine.Networking;
+using AnotherFileBrowser.Windows;
+using System.Collections;
+using System.Collections.Generic;
+
 
 public class Manager : MonoBehaviour
 {
@@ -143,6 +148,7 @@ public class Manager : MonoBehaviour
     public int h;
     public float s;
     public float v;
+
 
     private void Start()
     {
@@ -288,7 +294,9 @@ public class Manager : MonoBehaviour
         }
         else if ( chromaKeyActive )
         {
-            outputTexture = LinearEffects.ChromaKey(renderTexture,chromaRLevel,chromaGLevel,chromaBLevel, chromaLimit, imgBase);
+            if(imgBase != null){
+                outputTexture = LinearEffects.ChromaKey(renderTexture,chromaRLevel,chromaGLevel,chromaBLevel, chromaLimit, imgBase);
+            }
         }
         else if(hsvActive){
             outputTexture = LinearEffects.ApplyHsv(renderTexture, h,s,v);
@@ -659,5 +667,77 @@ public class Manager : MonoBehaviour
             vText.text = v.ToString();
         }
     }
+    public void GetImagem(){
+        var bp = new BrowserProperties();
+        bp.filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
+        bp.filterIndex = 0;
 
+        new FileBrowser().OpenFileBrowser(bp, path =>
+        {
+            //Load image from local path with UWR
+            StartCoroutine(LoadImage(path));
+        });
+
+        //Load Image from Local
+        IEnumerator LoadImage(string path)
+        {
+            using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(path))
+            {
+                yield return uwr.SendWebRequest();
+
+                if (uwr.isNetworkError || uwr.isHttpError)
+                {
+                    Debug.Log(uwr.error);
+                }
+                else
+                {
+                    inputTexture = DownloadHandlerTexture.GetContent(uwr);
+                    //placeholderImage is an Image Component of Unity UI
+                }
+            }
+            currentEffect = 0;
+            effects[currentEffect] = inputTexture;
+            RenderInput();
+        }
+
+    }
+    public void GetImagemChroma(){
+        var bp = new BrowserProperties();
+        bp.filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
+        bp.filterIndex = 0;
+
+        new FileBrowser().OpenFileBrowser(bp, path =>
+        {
+            //Load image from local path with UWR
+            StartCoroutine(LoadImageChroma(path));
+        });
+
+        //Load Image from Local
+        IEnumerator LoadImageChroma(string path)
+        {
+            using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(path))
+            {
+                yield return uwr.SendWebRequest();
+
+                if (uwr.isNetworkError || uwr.isHttpError)
+                {
+                    Debug.Log(uwr.error);
+                }
+                else
+                {
+                    imgBase = DownloadHandlerTexture.GetContent(uwr);
+                    //placeholderImage is an Image Component of Unity UI
+                }
+            }
+            inputKey.sprite = Sprite.Create(
+                imgBase,
+                new Rect(0, 0, imgBase.width, imgBase.height),
+                Vector2.zero
+            );
+            
+        }
+
+    }
 }
+
+//image handle
