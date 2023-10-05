@@ -174,7 +174,6 @@ namespace Scripts.Effects
             Color32[] pixels = inputTexture.GetPixels32();
 
             Color32[] fragmentationPixels = new Color32[pixels.Length];
-            Debug.Log(baseColor);
             for (int i = 0; i < pixels.Length; i++)
             {
                 int distance = (int)Math.Sqrt(Math.Pow(pixels[i].r-r,2)+Math.Pow(pixels[i].g-g,2)+Math.Pow(pixels[i].b-b,2));
@@ -203,9 +202,9 @@ namespace Scripts.Effects
                 for(int j = 0; j< inputTexture.width;j++){
                     int distance = (int)Math.Sqrt(Math.Pow((inputTexture.GetPixel(xText,yText).r*255)-r,2)+Math.Pow((inputTexture.GetPixel(xText,yText).g*255)-g,2)+Math.Pow((inputTexture.GetPixel(xText,yText).b*255)-b,2));
                     if(distance <= limit){
-                        fragmentationPixels[i,j] = inputTexture.GetPixel(xText,yText);
+                        fragmentationPixels[i,j] = baseImg.GetPixel(xText, yText);
                     }else{
-                        fragmentationPixels[i,j] = baseImg.GetPixel(xText, yText); 
+                        fragmentationPixels[i,j] = inputTexture.GetPixel(xText,yText);
                     }
                     xText++;
                 }
@@ -264,25 +263,10 @@ namespace Scripts.Effects
                 valor[1] += somadorGreen; 
                 valor[2] += somadorBlue;
             }
-            valor[0] = 255 - valor[0];
-            valor[1] = 255 - valor[1];
-            valor[2] = 255 - valor[2];
             for(int i =0; i < pixels.Length; i++){
-                if(pixels[i].r*255 > valor[0]){
-                    pixels[i].r = 1;
-                }else{
-                    pixels[i].r = 0;
-                }
-                if(pixels[i].g*255 > valor[1]){
-                    pixels[i].g = 1;
-                }else{
-                    pixels[i].g = 0;
-                }
-                if(pixels[i].b*255 > valor[2]){
-                    pixels[i].b = 1;
-                }else{
-                    pixels[i].b = 0;
-                }
+                pixels[i].r += (float)valor[0]/255;
+                pixels[i].g += (float)valor[1]/255;
+                pixels[i].b += (float)valor[2]/255;
                 float somaRed = (255 - (pixels[i].r*255))*s;
                 float somaGreen = (255 - (pixels[i].g*255))*s;
                 float somaBlue = (255 - (pixels[i].b*255))*s;

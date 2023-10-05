@@ -66,13 +66,16 @@ public class Manager : MonoBehaviour
     public float greyScaleWeightRed;
     public float greyScaleWeightGreen;
     public float greyScaleWeightBlue;
+    public float aritimeticMeanValue;
     public GameObject greyScalePanel;
     public Slider greyScaleWeightRedSlider;
     public Slider greyScaleWeightGreenSlider;
     public Slider greyScaleWeightBlueSlider;
+    public Slider aritimeticMeanSlider;
     public Text greyScaleWeightRedText;
     public Text greyScaleWeightGreenText;
     public Text greyScaleWeightBlueText;
+    public Text aritimeticMeanText;
 
     [Header("Pixelization Control")]
     public bool pixelizationActive;
@@ -149,6 +152,15 @@ public class Manager : MonoBehaviour
     public float s;
     public float v;
 
+    [Header("Scale")]
+    public float scaleValue;
+    public bool scaleActive;
+    public Slider scaleSlider;
+    public Text scaleValueText;
+    public GameObject scalePanel;
+    public int typeTransform = 1;
+
+
 
     private void Start()
     {
@@ -162,6 +174,7 @@ public class Manager : MonoBehaviour
         sobelActive = false;
         colorFragmentationActive = false;
         hsvActive = false;
+        scaleActive = false;
 
         //histogramObj = new Histogram();
 
@@ -301,6 +314,11 @@ public class Manager : MonoBehaviour
         else if(hsvActive){
             outputTexture = LinearEffects.ApplyHsv(renderTexture, h,s,v);
         }
+        else if(scaleActive){
+            if(scaleValue > 0){
+                outputTexture = LinearTransformation.Scale(renderTexture,scaleValue, typeTransform);
+            }
+        }
         else
         {
             //outputTexture = renderTexture;
@@ -369,6 +387,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
 
                 case 1: //Negativo
@@ -384,6 +403,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
 
                 case 2: // Threshold
@@ -399,6 +419,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
 
                 case 3: //Blur
@@ -414,6 +435,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
 
                 case 4: //Gamma Correction
@@ -429,6 +451,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
 
                 case 5: //Grey Scale
@@ -444,6 +467,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
 
                 case 6: //Pixelization
@@ -459,6 +483,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
 
                 case 7: //Histogram
@@ -474,6 +499,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
 
                 case 8: //Sobel
@@ -489,6 +515,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
                 case 9: //Generic Filter
                     negativeActive = false;
@@ -503,6 +530,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
                 case 10: //Color Fragmentation
                     negativeActive = false;
@@ -517,6 +545,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = true;
                     chromaKeyActive = false;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
                 case 11: //Chroma key
                     negativeActive = false;
@@ -531,6 +560,7 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = true;
                     hsvActive = false;
+                    scaleActive = false;
                     break;
                 case 12: //HSV
                     negativeActive = false;
@@ -545,6 +575,22 @@ public class Manager : MonoBehaviour
                     colorFragmentationActive = false;
                     chromaKeyActive = false;
                     hsvActive = true;
+                    scaleActive = false;
+                    break;
+                case 13: //Scale
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = true;
                     break;
                 default:
                     break;
@@ -556,6 +602,13 @@ public class Manager : MonoBehaviour
         gSliderLevel.value = rgbSliderLevel.value;
         bSliderLevel.value = rgbSliderLevel.value;
         rgbTextLevel.text = rgbSliderLevel.value.ToString();
+        PanelManager();
+    }
+    public void WeightRgbmanager(){
+        greyScaleWeightRedSlider.value = aritimeticMeanSlider.value;
+        greyScaleWeightGreenSlider.value = aritimeticMeanSlider.value;
+        greyScaleWeightBlueSlider.value = aritimeticMeanSlider.value;
+        aritimeticMeanText.text = aritimeticMeanSlider.value.ToString();
         PanelManager();
     }
     public void changeColorBase(int type){
@@ -574,6 +627,7 @@ public class Manager : MonoBehaviour
         }
         colorbase.a = 255;
     }
+
     public void SetValue(int valueSet){
             sobelValue = valueSet; 
     }
@@ -592,7 +646,7 @@ public class Manager : MonoBehaviour
         colorFragmentationPanel.SetActive(colorFragmentationActive);
         chromaKeyPanel.SetActive(chromaKeyActive);
         hsvPanel.SetActive(hsvActive);
-        
+        scalePanel.SetActive(scaleActive);
         if( negativeActive )
         {   
         }
@@ -628,6 +682,8 @@ public class Manager : MonoBehaviour
 
             greyScaleWeightBlue = greyScaleWeightBlueSlider.value * greyScaleMax;
             greyScaleWeightBlueText.text = (greyScaleWeightBlue / greyScaleMax).ToString();
+
+
         }
         else if ( pixelizationActive )
         {
@@ -665,6 +721,10 @@ public class Manager : MonoBehaviour
             sText.text = s.ToString();
             v = vLevel.value;
             vText.text = v.ToString();
+        }
+        else if(scaleActive){
+            scaleValue = scaleSlider.value;
+            scaleValueText.text = scaleValue.ToString();
         }
     }
     public void GetImagem(){
