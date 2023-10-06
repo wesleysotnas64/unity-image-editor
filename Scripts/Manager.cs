@@ -156,9 +156,21 @@ public class Manager : MonoBehaviour
     public float scaleValue;
     public bool scaleActive;
     public Slider scaleSlider;
+    public Slider typeTransformSlider;
     public Text scaleValueText;
+    public Text typeTransformText;
     public GameObject scalePanel;
     public int typeTransform = 1;
+
+    [Header("Rotation")]
+    public int angValue;
+    public bool rotationActive;
+    public Slider angSlider;
+    public Slider typeTransformRotSlider;
+    public Text angValueText;
+    public Text typeTransformRotText;
+    public GameObject angPanel;
+    public int typeTransformRot = 1;
 
 
 
@@ -319,13 +331,15 @@ public class Manager : MonoBehaviour
                 outputTexture = LinearTransformation.Scale(renderTexture,scaleValue, typeTransform);
             }
         }
+        else if(rotationActive){
+            outputTexture = LinearTransformation.Rotacao(renderTexture,angValue, typeTransform);
+        }
         else
         {
             //outputTexture = renderTexture;
             outputTexture = LinearEffects.ColorFromDist(renderTexture);
         }
     }
-
     public void Undo()
     {
         if (currentEffect > 0)
@@ -388,6 +402,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
 
                 case 1: //Negativo
@@ -404,6 +419,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
 
                 case 2: // Threshold
@@ -420,6 +436,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
 
                 case 3: //Blur
@@ -436,6 +453,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
 
                 case 4: //Gamma Correction
@@ -452,6 +470,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
 
                 case 5: //Grey Scale
@@ -468,6 +487,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
 
                 case 6: //Pixelization
@@ -484,6 +504,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
 
                 case 7: //Histogram
@@ -500,6 +521,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
 
                 case 8: //Sobel
@@ -516,6 +538,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
                 case 9: //Generic Filter
                     negativeActive = false;
@@ -531,6 +554,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
                 case 10: //Color Fragmentation
                     negativeActive = false;
@@ -546,6 +570,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
                 case 11: //Chroma key
                     negativeActive = false;
@@ -561,6 +586,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = true;
                     hsvActive = false;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
                 case 12: //HSV
                     negativeActive = false;
@@ -576,6 +602,7 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = true;
                     scaleActive = false;
+                    rotationActive= false;
                     break;
                 case 13: //Scale
                     negativeActive = false;
@@ -591,6 +618,23 @@ public class Manager : MonoBehaviour
                     chromaKeyActive = false;
                     hsvActive = false;
                     scaleActive = true;
+                    rotationActive= false;
+                    break;
+                case 14: //Scale
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive= true;
                     break;
                 default:
                     break;
@@ -647,6 +691,7 @@ public class Manager : MonoBehaviour
         chromaKeyPanel.SetActive(chromaKeyActive);
         hsvPanel.SetActive(hsvActive);
         scalePanel.SetActive(scaleActive);
+        angPanel.SetActive(rotationActive);
         if( negativeActive )
         {   
         }
@@ -725,6 +770,14 @@ public class Manager : MonoBehaviour
         else if(scaleActive){
             scaleValue = scaleSlider.value;
             scaleValueText.text = scaleValue.ToString();
+            typeTransform = (int)typeTransformSlider.value;
+            typeTransformText.text = typeTransform.ToString();
+        }
+        else if(rotationActive){
+            angValue = (int)angSlider.value;
+            angValueText.text = angValue.ToString();
+            typeTransformRot = (int)typeTransformRotSlider.value;
+            typeTransformRotText.text = typeTransformRot.ToString();
         }
     }
     public void GetImagem(){
