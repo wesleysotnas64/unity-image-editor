@@ -21,6 +21,16 @@ public class Manager : MonoBehaviour
     public List<Texture2D> effects;
     public int currentEffect;
 
+    [Header("histogram Controloutput")]
+    public GameObject histogramPanelOutput;
+    public bool histogramPanelActive;
+    public Texture2D histogramRed;
+    public Texture2D histogramGreen;
+    public Texture2D histogramBlue;
+    public Image histogramRedOutput;
+    public Image histogramGreenOutput;
+    public Image histogramBlueOutput;
+
     [Header("Dropdown Control")]
     public Dropdown dropdown; 
 
@@ -66,16 +76,13 @@ public class Manager : MonoBehaviour
     public float greyScaleWeightRed;
     public float greyScaleWeightGreen;
     public float greyScaleWeightBlue;
-    public float aritimeticMeanValue;
     public GameObject greyScalePanel;
     public Slider greyScaleWeightRedSlider;
     public Slider greyScaleWeightGreenSlider;
     public Slider greyScaleWeightBlueSlider;
-    public Slider aritimeticMeanSlider;
     public Text greyScaleWeightRedText;
     public Text greyScaleWeightGreenText;
     public Text greyScaleWeightBlueText;
-    public Text aritimeticMeanText;
 
     [Header("Pixelization Control")]
     public bool pixelizationActive;
@@ -103,6 +110,9 @@ public class Manager : MonoBehaviour
     public int[,] genericMask = new int[10,10];
     int quantity = 0;
     int sizeGenericMask = 3;
+    public int multiplier;
+    public Slider multiplierSlide;
+    public Text multiplierText;
 
     [Header("Color fragmentation")]
     public bool colorFragmentationActive;
@@ -187,6 +197,7 @@ public class Manager : MonoBehaviour
         colorFragmentationActive = false;
         hsvActive = false;
         scaleActive = false;
+        histogramPanelActive = false;
 
         //histogramObj = new Histogram();
 
@@ -221,7 +232,7 @@ public class Manager : MonoBehaviour
         if(quantity < sizeGenericMask*sizeGenericMask){
             int line = quantity/sizeGenericMask;
             int column = quantity / sizeGenericMask;
-            genericMask[line,column] = value;
+            genericMask[line,column] = value*multiplier;
             quantity += 1;
         }else{
             Debug.Log("Num vo aguentar mais...tira...tira caraio");
@@ -241,7 +252,18 @@ public class Manager : MonoBehaviour
     }
     private void RenderInput()
     {
-
+        if(histogramPanelActive){
+            Histogram.CalcHistogram(effects[currentEffect]);
+            histogramRed = Histogram.ReturnHistogramRed();
+            histogramBlue = Histogram.ReturnHistogramBlue();
+            histogramGreen = Histogram.ReturnHistogramGreen();
+            histogramRedOutput.sprite = Sprite.Create(histogramRed,new Rect(0, 0, histogramRed.width, histogramRed.height),
+            Vector2.zero);
+            histogramGreenOutput.sprite = Sprite.Create(histogramGreen,new Rect(0, 0, histogramGreen.width, histogramGreen.height),
+            Vector2.zero);
+            histogramBlueOutput.sprite = Sprite.Create(histogramBlue,new Rect(0, 0, histogramBlue.width, histogramBlue.height),
+            Vector2.zero);
+        }
         if(inputRender != null)
         {
             Texture2D renderTexture = effects[currentEffect];
@@ -288,15 +310,12 @@ public class Manager : MonoBehaviour
         {
             outputTexture = LinearEffects.GrayScale(renderTexture, greyScaleWeightRed, greyScaleWeightGreen, greyScaleWeightBlue);
         }
+        else if(histogramActive){
+            outputTexture = Histogram.EqualizeHistogram(renderTexture);
+        }
         else if (pixelizationActive)
         {
             outputTexture = LinearEffects.Pixelization(renderTexture, pixelizationPixelSize);
-        }
-        else if ( histogramActive )
-        {
-            histogramObj = new Histogram();
-            histogramObj.CalcHistogram(renderTexture);
-            outputTexture = histogramObj.EqualizeHistogram(renderTexture);
         }
         else if ( sobelActive )
         {
@@ -332,7 +351,7 @@ public class Manager : MonoBehaviour
             }
         }
         else if(rotationActive){
-            outputTexture = LinearTransformation.Rotacao(renderTexture,angValue, typeTransform);
+            outputTexture = LinearTransformation.Rotacao(renderTexture,angValue, typeTransformRot);
         }
         else
         {
@@ -620,7 +639,7 @@ public class Manager : MonoBehaviour
                     scaleActive = true;
                     rotationActive= false;
                     break;
-                case 14: //Scale
+                case 14: //Rotation
                     negativeActive = false;
                     thresholdActive = false;
                     blurActive = false;
@@ -649,10 +668,9 @@ public class Manager : MonoBehaviour
         PanelManager();
     }
     public void WeightRgbmanager(){
-        greyScaleWeightRedSlider.value = aritimeticMeanSlider.value;
-        greyScaleWeightGreenSlider.value = aritimeticMeanSlider.value;
-        greyScaleWeightBlueSlider.value = aritimeticMeanSlider.value;
-        aritimeticMeanText.text = aritimeticMeanSlider.value.ToString();
+        greyScaleWeightRedSlider.value = 1;
+        greyScaleWeightGreenSlider.value = 1;
+        greyScaleWeightBlueSlider.value = 1;
         PanelManager();
     }
     public void changeColorBase(int type){
@@ -675,6 +693,16 @@ public class Manager : MonoBehaviour
     public void SetValue(int valueSet){
             sobelValue = valueSet; 
     }
+    public void HideShowHistogram(){
+        if(histogramPanelActive){
+            histogramPanelActive = false;
+        }
+        else{
+            histogramPanelActive = true;
+        }
+        histogramPanelOutput.SetActive(histogramPanelActive);
+        RenderInput();
+    }
     private void PanelManager()
     {
         //Altera visibilidade dos pain�is.
@@ -692,6 +720,7 @@ public class Manager : MonoBehaviour
         hsvPanel.SetActive(hsvActive);
         scalePanel.SetActive(scaleActive);
         angPanel.SetActive(rotationActive);
+        histogramPanelOutput.SetActive(histogramPanelActive);
         if( negativeActive )
         {   
         }
@@ -739,6 +768,10 @@ public class Manager : MonoBehaviour
         {   
             normalizerValue = (int)normalizerSlider.value;
         }
+        else if(genericActive){
+            multiplier = (int)multiplierSlide.value;
+            multiplierText.text = multiplier.ToString();
+        }
         else if( colorFragmentationActive )
         {   
             colorRLevel = (int)rColorSliderLevel.value;
@@ -749,6 +782,7 @@ public class Manager : MonoBehaviour
             bColorTextLevel.text = colorBLevel.ToString();
             limit = (int)limitSlider.value;
             limitTextLevel.text = limit.ToString();
+
         }else if(chromaKeyActive){
             chromaRLevel = (int)rChromaSliderLevel.value;
             rChromaTextLevel.text = chromaRLevel.ToString();

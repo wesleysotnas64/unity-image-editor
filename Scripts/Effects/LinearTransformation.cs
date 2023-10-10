@@ -15,6 +15,28 @@ public class LinearTransformation : MonoBehaviour
     {
         
     }
+    public static Color InterpolacaoLinearRotacao(Texture2D inputTexture, float x, float y){
+        float xComplement = (float)Convert.ToDouble(x - Convert.ToInt32(x));
+        float yComplement = (float)Convert.ToDouble(y - Convert.ToInt32(y));
+        Color posX1 = inputTexture.GetPixel((int)x, (int)y);
+        Color posX2 = inputTexture.GetPixel((int)x + 1, (int)y);
+        Color posX3 = inputTexture.GetPixel((int)x, (int)y+1);
+        Color posX4 = inputTexture.GetPixel((int)x + 1, (int)y+1);
+        Color[] finalInterpolation = new Color[2];
+        finalInterpolation[0].r = (float)((1-xComplement)*posX1.r + (xComplement)*posX2.r);
+        finalInterpolation[0].g = (float)((1-xComplement)*posX1.g + (xComplement)*posX2.g);
+        finalInterpolation[0].b = (float)((1-xComplement)*posX1.b + (xComplement)*posX2.b);
+        finalInterpolation[1].r = (float)((1-xComplement)*posX3.r + (xComplement)*posX4.r);
+        finalInterpolation[1].g = (float)((1-xComplement)*posX3.g + (xComplement)*posX4.g);
+        finalInterpolation[1].b = (float)((1-xComplement)*posX3.b + (xComplement)*posX4.b);
+        Color corFinal = new Color();
+        corFinal.r = (float)((1-yComplement) * finalInterpolation[0].r + (yComplement) * finalInterpolation[1].r);
+        corFinal.g = (float)((1-yComplement) * finalInterpolation[0].g + (yComplement) * finalInterpolation[1].g);
+        corFinal.b = (float)((1-yComplement) * finalInterpolation[0].b + (yComplement) * finalInterpolation[1].b);
+        corFinal.a = 1;
+        return corFinal;
+
+    }
     public static Texture2D Rotacao(Texture2D inputTexture, int angValue, int typeTransform){
         float cosseno = (float)Math.Round(Math.Cos((Math.PI/180) * angValue),2);
         float seno = (float)Math.Round(Math.Sin((Math.PI/180) * angValue),2);
@@ -30,8 +52,8 @@ public class LinearTransformation : MonoBehaviour
 
         for(int i = 0; i < inputTexture.height; i++){
             for(int j = 0; j < inputTexture.width; j++){
-                matrizPositionsX[i,j] = Convert.ToInt32((j * seno ) + (i *cosseno));
-                matrizPositionsY[i,j] = Convert.ToInt32((j * cosseno) - (i * seno)); 
+                matrizPositionsX[i,j] = Convert.ToInt32((j * matrizRotacao[1,0]) + (i * matrizRotacao[1,1]));
+                matrizPositionsY[i,j] = Convert.ToInt32((j * matrizRotacao[0,0]) + (i *matrizRotacao[0,1])); 
             }
         }
         for(int i = 0; i <inputTexture.height; i++){
@@ -51,25 +73,19 @@ public class LinearTransformation : MonoBehaviour
             }
         }
         Texture2D outputTexture = new Texture2D(maxPos[1] - minPos[1],maxPos[0] - minPos[0]);
-        Debug.Log(maxPos[0]-minPos[0]);
-        Debug.Log(maxPos[1]-minPos[1]);
-        Debug.Log(inputTexture.width);
         Color black = new Color(0,0,0,1);
-        Debug.Log(inputTexture.height);
-        Debug.Log("preenchi com zeros");
         for(int i =0; i < outputTexture.height; i++){
             for(int j=0; j < outputTexture.width;j++){
                 outputTexture.SetPixel(i,j, black);
             }
         }
-        int xText;
-        int yText = 0;
-        for(int i =0; i < inputTexture.height; i++){
-            xText = 0;
-            for(int j=0; j < inputTexture.width;j++){
-                int xCord = Convert.ToInt32((j * matrizRotacao[0,0]) + (i *matrizRotacao[0,1]));
-                int yCord = Convert.ToInt32((j * matrizRotacao[1,0]) + (i * matrizRotacao[1,1]));
-                outputTexture.SetPixel(xCord,yCord, inputTexture.GetPixel(j,i));
+        if(typeTransform == 1){
+            for(int i =0; i < inputTexture.height; i++){
+                for(int j=0; j < inputTexture.width;j++){
+                    int xCord = Convert.ToInt32((j * matrizRotacao[0,0]) + (i *matrizRotacao[0,1]));
+                    int yCord = Convert.ToInt32((j * matrizRotacao[1,0]) + (i * matrizRotacao[1,1]));
+                    outputTexture.SetPixel(xCord,yCord, inputTexture.GetPixel(j,i));
+                }
             }
         }
         outputTexture.Apply();
