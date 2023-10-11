@@ -40,6 +40,9 @@ public class LinearTransformation : MonoBehaviour
     public static Texture2D Rotacao(Texture2D inputTexture, int angValue, int typeTransform){
         float cosseno = (float)Math.Round(Math.Cos((Math.PI/180) * angValue),2);
         float seno = (float)Math.Round(Math.Sin((Math.PI/180) * angValue),2);
+        int[] center = new int[2];
+        center[0] = (int)inputTexture.width/2;
+        center[1] = (int)inputTexture.height/2;
         double[ , ] matrizRotacao = new double[2,2];
         matrizRotacao[0,0] = cosseno;
         matrizRotacao[0,1] = -seno;
@@ -82,7 +85,7 @@ public class LinearTransformation : MonoBehaviour
         if(typeTransform == 1){
             for(int i =0; i < inputTexture.height; i++){
                 for(int j=0; j < inputTexture.width;j++){
-                    int xCord = Convert.ToInt32((j * matrizRotacao[0,0]) + (i *matrizRotacao[0,1]));
+                    int xCord = Convert.ToInt32((j * matrizRotacao[0,0]) + (i * matrizRotacao[0,1]));
                     int yCord = Convert.ToInt32((j * matrizRotacao[1,0]) + (i * matrizRotacao[1,1]));
                     outputTexture.SetPixel(xCord,yCord, inputTexture.GetPixel(j,i));
                 }

@@ -3,12 +3,12 @@ using UnityEngine.UI;
 using Scripts.Effects;
 using Scripts.Utils;
 using System.Collections.Generic;
-using UnityEngine.Windows;
 using UnityEngine.UIElements.Experimental;
 using UnityEngine.Networking;
 using AnotherFileBrowser.Windows;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 
 public class Manager : MonoBehaviour
@@ -44,6 +44,10 @@ public class Manager : MonoBehaviour
     public float rLevel;
     public float gLevel;
     public float bLevel;
+
+    public Text thresholdTypeText;
+    public int thresholdType;
+    public Slider thresholdTypeSlider;
     public GameObject thresholdPanel;
     public Slider rgbSliderLevel;
     public Text rgbTextLevel;
@@ -182,6 +186,21 @@ public class Manager : MonoBehaviour
     public GameObject angPanel;
     public int typeTransformRot = 1;
 
+    [Header("logaritimic Transformation")]
+
+    public GameObject transformLogaritimicPanel;
+    public bool transformationLogaritimicActive;
+    public int rCValue;
+    public int bCValue;
+    public int gCValue;
+
+    public Slider rCSlider;
+    public Slider bCSlider;
+    public Slider gCSlider;
+
+    public Text rCText;
+    public Text gCText;
+    public Text bCText;
 
 
     private void Start()
@@ -198,6 +217,7 @@ public class Manager : MonoBehaviour
         hsvActive = false;
         scaleActive = false;
         histogramPanelActive = false;
+        transformationLogaritimicActive = false;
 
         //histogramObj = new Histogram();
 
@@ -296,7 +316,7 @@ public class Manager : MonoBehaviour
         }
         else if (thresholdActive)
         {
-            outputTexture = LinearEffects.Threshold(renderTexture, rLevel,gLevel,bLevel);
+            outputTexture = LinearEffects.Threshold(renderTexture, rLevel,gLevel,bLevel, thresholdType, rgbLevel);
         }
         else if (blurActive)
         {
@@ -310,7 +330,7 @@ public class Manager : MonoBehaviour
         {
             outputTexture = LinearEffects.GrayScale(renderTexture, greyScaleWeightRed, greyScaleWeightGreen, greyScaleWeightBlue);
         }
-        else if(histogramActive){
+        else if(histogramActive && histogramPanelActive){
             outputTexture = Histogram.EqualizeHistogram(renderTexture);
         }
         else if (pixelizationActive)
@@ -352,6 +372,9 @@ public class Manager : MonoBehaviour
         }
         else if(rotationActive){
             outputTexture = LinearTransformation.Rotacao(renderTexture,angValue, typeTransformRot);
+        }
+        else if(transformationLogaritimicActive){
+            outputTexture = LinearEffects.LogartimicaTransform(renderTexture,rCValue, bCValue, gCValue);
         }
         else
         {
@@ -422,6 +445,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
 
                 case 1: //Negativo
@@ -439,6 +463,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
 
                 case 2: // Threshold
@@ -456,6 +481,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
 
                 case 3: //Blur
@@ -473,6 +499,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
 
                 case 4: //Gamma Correction
@@ -490,6 +517,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
 
                 case 5: //Grey Scale
@@ -507,6 +535,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
 
                 case 6: //Pixelization
@@ -524,6 +553,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
 
                 case 7: //Histogram
@@ -541,6 +571,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
 
                 case 8: //Sobel
@@ -558,6 +589,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
                 case 9: //Generic Filter
                     negativeActive = false;
@@ -574,6 +606,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
                 case 10: //Color Fragmentation
                     negativeActive = false;
@@ -590,6 +623,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
                 case 11: //Chroma key
                     negativeActive = false;
@@ -606,6 +640,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
                 case 12: //HSV
                     negativeActive = false;
@@ -622,6 +657,7 @@ public class Manager : MonoBehaviour
                     hsvActive = true;
                     scaleActive = false;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
                 case 13: //Scale
                     negativeActive = false;
@@ -638,6 +674,7 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = true;
                     rotationActive= false;
+                    transformationLogaritimicActive = false;
                     break;
                 case 14: //Rotation
                     negativeActive = false;
@@ -654,18 +691,29 @@ public class Manager : MonoBehaviour
                     hsvActive = false;
                     scaleActive = false;
                     rotationActive= true;
+                    transformationLogaritimicActive = false;
+                    break;
+                case 15: //Logaritimic Transform
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive= false;
+                    transformationLogaritimicActive = true;
                     break;
                 default:
                     break;
             }
         }
-    }
-    public void RgbManager(){
-        rSliderLevel.value = rgbSliderLevel.value;
-        gSliderLevel.value = rgbSliderLevel.value;
-        bSliderLevel.value = rgbSliderLevel.value;
-        rgbTextLevel.text = rgbSliderLevel.value.ToString();
-        PanelManager();
     }
     public void WeightRgbmanager(){
         greyScaleWeightRedSlider.value = 1;
@@ -721,6 +769,8 @@ public class Manager : MonoBehaviour
         scalePanel.SetActive(scaleActive);
         angPanel.SetActive(rotationActive);
         histogramPanelOutput.SetActive(histogramPanelActive);
+        transformLogaritimicPanel.SetActive(transformationLogaritimicActive);
+
         if( negativeActive )
         {   
         }
@@ -732,6 +782,10 @@ public class Manager : MonoBehaviour
             gTextLevel.text = gLevel.ToString();
             bLevel = bSliderLevel.value;
             bTextLevel.text = bLevel.ToString();
+            rgbLevel = rgbSliderLevel.value;
+            rgbTextLevel.text = rgbLevel.ToString();
+            thresholdType = (int)thresholdTypeSlider.value;
+            thresholdTypeText.text = thresholdType.ToString();
         }
         else if( blurActive )
         {
@@ -813,6 +867,14 @@ public class Manager : MonoBehaviour
             typeTransformRot = (int)typeTransformRotSlider.value;
             typeTransformRotText.text = typeTransformRot.ToString();
         }
+        else if(transformationLogaritimicActive){
+            rCValue = (int)rCSlider.value;
+            rCText.text = rCValue.ToString();
+            bCValue = (int)bCSlider.value;
+            bCText.text = bCValue.ToString();
+            gCValue = (int)gCSlider.value;
+            gCText.text = gCValue.ToString();
+        }
     }
     public void GetImagem(){
         var bp = new BrowserProperties();
@@ -839,7 +901,6 @@ public class Manager : MonoBehaviour
                 else
                 {
                     inputTexture = DownloadHandlerTexture.GetContent(uwr);
-                    //placeholderImage is an Image Component of Unity UI
                 }
             }
             currentEffect = 0;
@@ -848,6 +909,25 @@ public class Manager : MonoBehaviour
         }
 
     }
+    public void SaveImage(){
+        var bp = new BrowserProperties();
+        bp.filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
+        bp.filterIndex = 0;
+
+        new FileBrowser().SaveFileBrowser(bp,"teste",".png", path =>
+        {
+            Texture2D finalTexture = new Texture2D(inputTexture.width, inputTexture.height);
+            Color[] cores = inputTexture.GetPixels();
+            finalTexture.SetPixels(cores);
+            byte[] bytes = finalTexture.EncodeToJPG();
+            File.WriteAllBytes(path, bytes);
+        });
+    }
+
+
+
+
+
     public void GetImagemChroma(){
         var bp = new BrowserProperties();
         bp.filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
@@ -872,16 +952,9 @@ public class Manager : MonoBehaviour
                 }
                 else
                 {
-                    imgBase = DownloadHandlerTexture.GetContent(uwr);
-                    //placeholderImage is an Image Component of Unity UI
+
                 }
-            }
-            inputKey.sprite = Sprite.Create(
-                imgBase,
-                new Rect(0, 0, imgBase.width, imgBase.height),
-                Vector2.zero
-            );
-            
+            } 
         }
 
     }

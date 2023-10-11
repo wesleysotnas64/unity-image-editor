@@ -126,15 +126,23 @@ public class Histogram : MonoBehaviour
 
         for(int i = 0; i < 256; i++)
         {
-            valor = (redChannel[i] / length) * 255;
+            valor = (redChannel[i] / (float)length) * 255;
             redEqualized[i] = (int)valor;
-            Debug.Log(valor);
+            if(valor > 0){
+                Debug.Log("pos["+i.ToString()+"], valor:"+valor.ToString());
+            }
 
-            valor = (greenChannel[i] / length) * 255;
+            valor = (greenChannel[i] / (float)length) * 255;
             greenEqualized[i] = (int)valor;
+            if(valor > 0){
+                Debug.Log("pos["+i.ToString()+"], valor:"+valor.ToString());
+            }
 
-            valor = (blueChannel[i] / length) * 255;
+            valor = (blueChannel[i] / (float)length) * 255;
             blueEqualized[i] = (int)valor;
+            if(valor > 0){
+                Debug.Log("pos["+i.ToString()+"], valor:"+valor.ToString());
+            }
         }
 
         Color32[] imgEqualized = new Color32[length];
@@ -143,6 +151,7 @@ public class Histogram : MonoBehaviour
             imgEqualized[i].r = (byte) redEqualized[pixels[i].r];
             imgEqualized[i].g = (byte) greenEqualized[pixels[i].g];
             imgEqualized[i].b = (byte) blueEqualized[pixels[i].b];
+            imgEqualized[i].a = (byte) pixels[i].a;
         }
 
         Texture2D output = new Texture2D(texture.width, texture.height);

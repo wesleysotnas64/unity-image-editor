@@ -102,39 +102,66 @@ namespace Scripts.Effects
 
         }
 
-        public static Texture2D Threshold(Texture2D inputTexture, float r, float g, float b)
+        public static Texture2D Threshold(Texture2D inputTexture, float r, float g, float b, int type, float value)
         {
             Color[] pixels = inputTexture.GetPixels();
 
             Color[] thresholdPixels = new Color[pixels.Length];
             for (int i = 0; i < pixels.Length; i++)
             {
-                float redThreshold;
-                float greenThreshold;
-                float blueThreshold;
-                if (pixels[i].r < r)
-                {
-                    redThreshold = 0;
-                }
-                else
-                {
-                    redThreshold = 1;
-                }
-                if (pixels[i].g < g)
-                {
-                    greenThreshold = 0;
-                }
-                else
-                {
-                    greenThreshold = 1;
-                }
-                if (pixels[i].b < b)
-                {
-                    blueThreshold = 0;
-                }
-                else
-                {
-                    blueThreshold = 1;
+                float redThreshold = 0;
+                float greenThreshold = 0;
+                float blueThreshold = 0;
+                if(type == 1){
+                    if (pixels[i].r < value)
+                    {
+                        redThreshold = 0;
+                    }
+                    else
+                    {
+                        redThreshold = 1;
+                    }
+                    if (pixels[i].g < value)
+                    {
+                        greenThreshold = 0;
+                    }
+                    else
+                    {
+                        greenThreshold = 1;
+                    }
+                    if (pixels[i].b < value)
+                    {
+                        blueThreshold = 0;
+                    }
+                    else
+                    {
+                        blueThreshold = 1;
+                    }
+                }else if(type == 2){
+                    if (pixels[i].r < r)
+                    {
+                        redThreshold = 0;
+                    }
+                    else
+                    {
+                        redThreshold = 1;
+                    }
+                    if (pixels[i].g < g)
+                    {
+                        greenThreshold = 0;
+                    }
+                    else
+                    {
+                        greenThreshold = 1;
+                    }
+                    if (pixels[i].b < b)
+                    {
+                        blueThreshold = 0;
+                    }
+                    else
+                    {
+                        blueThreshold = 1;
+                    }
                 }
 
                 thresholdPixels[i] = new Color(redThreshold, greenThreshold, blueThreshold, pixels[i].a);
@@ -188,6 +215,28 @@ namespace Scripts.Effects
             outputTexture.SetPixels32(fragmentationPixels);
             outputTexture.Apply();
 
+            return outputTexture;
+        }
+        public static Texture2D LogartimicaTransform(Texture2D inputTexture, double rC, double bC,double gC )
+        {
+            Color32[] pixels = inputTexture.GetPixels32();
+
+            Color32[] transformacaoLog = new Color32[pixels.Length];
+            rC = rC / Math.Log(256);
+            bC = bC / Math.Log(256);
+            gC = gC / Math.Log(256);
+            
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                int redTransform = (int)(rC * Math.Log(1 + pixels[i].r));
+                int greenTransform = (int)(bC * Math.Log(1 + pixels[i].g));
+                int blueTransform = (int)(gC * Math.Log(1 + pixels[i].b));
+                transformacaoLog[i] = new Color32((byte)(redTransform),(byte)(greenTransform),(byte)(blueTransform), pixels[i].a);
+
+            }
+            Texture2D outputTexture = new Texture2D(inputTexture.width, inputTexture.height);
+            outputTexture.SetPixels32(transformacaoLog);
+            outputTexture.Apply();
             return outputTexture;
         }
         public static Texture2D ChromaKey(Texture2D inputTexture, int r, int g, int b, int limit, Texture2D baseImg)
