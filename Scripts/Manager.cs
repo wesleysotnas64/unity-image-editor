@@ -68,11 +68,17 @@ public class Manager : MonoBehaviour
 
     [Header("Gamma Correcition Control")]
     public bool gammaActive;
-    public float gammaLevel;
+    public float gammaRedLevel;
+    public float gammaGreenLevel;
+    public float gammaBlueLevel;
     public float gammaMaxLevel;
     public GameObject gammaPanel;
-    public Slider gammaSliderLevel;
-    public Text gammaTextLevel;
+    public Slider gammaRedSliderLevel;
+    public Slider gammaGreenSliderLevel;
+    public Slider gammaBlueSliderLevel;
+    public Text gammaRedTextLevel;
+    public Text gammaGreenTextLevel;
+    public Text gammaBlueTextLevel;
 
     [Header("Grey Scale Control")]
     public bool greyScaleActive;
@@ -324,7 +330,7 @@ public class Manager : MonoBehaviour
         }
         else if (gammaActive)
         {
-            outputTexture = LinearEffects.GammaCorrection(renderTexture, gammaLevel);
+            outputTexture = LinearEffects.GammaCorrection(renderTexture, gammaRedLevel, gammaBlueLevel, gammaGreenLevel);
         }
         else if (greyScaleActive)
         {
@@ -796,9 +802,17 @@ public class Manager : MonoBehaviour
         }
         else if( gammaActive )
         {
-            gammaLevel = gammaSliderLevel.value * gammaMaxLevel;
-            gammaSliderLevel.value = gammaLevel/gammaMaxLevel;
-            gammaTextLevel.text = gammaLevel.ToString();
+            gammaRedLevel = gammaRedSliderLevel.value * gammaMaxLevel;
+            gammaRedSliderLevel.value = gammaRedLevel/gammaMaxLevel;
+            gammaRedTextLevel.text = gammaRedLevel.ToString();
+
+            gammaGreenLevel = gammaGreenSliderLevel.value * gammaMaxLevel;
+            gammaGreenSliderLevel.value = gammaGreenLevel/gammaMaxLevel;
+            gammaGreenTextLevel.text = gammaGreenLevel.ToString();
+
+            gammaBlueLevel = gammaBlueSliderLevel.value * gammaMaxLevel;
+            gammaBlueSliderLevel.value = gammaBlueLevel/gammaMaxLevel;
+            gammaBlueTextLevel.text = gammaBlueLevel.ToString();
         }
         else if ( greyScaleActive )
         {

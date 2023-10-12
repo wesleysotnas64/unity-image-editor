@@ -174,7 +174,7 @@ namespace Scripts.Effects
             return outputTexture;
         }
 
-        public static Texture2D GammaCorrection(Texture2D inputTexture, float gamma)
+        public static Texture2D GammaCorrection(Texture2D inputTexture, float gammaRed, float gammaBlue, float gammaGreen)
         {
             int width = inputTexture.width;
             int height = inputTexture.height;
@@ -185,9 +185,9 @@ namespace Scripts.Effects
                 for (int j = 0; j < height; j++)
                 {
                     pixel = inputTexture.GetPixel(i, j);
-                    pixel.r = (float)Math.Pow(pixel.r, gamma);
-                    pixel.g = (float)Math.Pow(pixel.g, gamma);
-                    pixel.b = (float)Math.Pow(pixel.b, gamma);
+                    pixel.r = (float)Math.Pow(pixel.r, gammaRed);
+                    pixel.g = (float)Math.Pow(pixel.g, gammaGreen);
+                    pixel.b = (float)Math.Pow(pixel.b, gammaBlue);
                     outputTexture.SetPixel(i, j, pixel);
                 }
             }
