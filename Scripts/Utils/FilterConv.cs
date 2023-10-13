@@ -40,7 +40,26 @@ namespace Scripts.Utils
             final.Apply();
             return final;
         }
-
+        public Color CalcKernelMedian(int width, int height, int i, int j, int desloc){
+            Color px;
+            int pos = 0;
+            float[] colors = new float[sizeMask*sizeMask];
+            for (int iImg = (i - desloc); iImg <= (i + desloc); iImg++)
+            {
+                for (int jImg = (j - desloc); jImg <= (j + desloc); jImg++)
+                {
+                    if (InsideTexture(width, height, iImg, jImg))
+                    {
+                        px = img[iImg, jImg];
+                        colors[pos] = px.r;
+                        pos+=1;
+                    }
+                }
+            }
+            Array.Sort(colors);
+            Color color = new Color(colors[(sizeMask*sizeMask)/2],colors[(sizeMask*sizeMask)/2],colors[(sizeMask*sizeMask)/2],1);
+            return color;
+        }
         private Color CalcKernel(int width, int height, int i, int j, int desloc)
         {
             Color px;
@@ -123,6 +142,17 @@ namespace Scripts.Utils
             return this.imgProc;
         }
         
+        public void ApplyMedian(){
+            int desloc = (sizeMask - 1) / 2;
+            imgProc = new Color[this.height, this.width];
+            for (int i = 0; i < this.height; i++)
+            {
+                for (int j = 0; j < this.width; j++)
+                {
+                    imgProc[i,j] = CalcKernelMedian(this.width, this.height, i, j, desloc);
+                }
+            }
+        }
         public void ApplyConv()
         {
             int desloc = (sizeMask - 1) / 2;

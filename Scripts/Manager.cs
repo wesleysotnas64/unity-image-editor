@@ -208,6 +208,25 @@ public class Manager : MonoBehaviour
     public Text gCText;
     public Text bCText;
 
+    [Header("Laplacian Filter")]
+
+    public GameObject laplacianPanel;
+    public bool laplacianActive;
+    public int normalizeLaplace;
+    public Slider normalizeLaplaceSlider;
+
+    [Header("Filtro mediana")]
+
+    public GameObject medianPanel;
+    public bool medianActive;
+
+    [Header("Filtro Gaussie")]
+
+    public GameObject gaussPanel;
+    public bool gaussActive;
+
+
+
 
     private void Start()
     {
@@ -224,6 +243,9 @@ public class Manager : MonoBehaviour
         scaleActive = false;
         histogramPanelActive = false;
         transformationLogaritimicActive = false;
+        laplacianActive = false;
+        medianActive = false;
+        gaussActive = false;
 
         //histogramObj = new Histogram();
 
@@ -253,7 +275,10 @@ public class Manager : MonoBehaviour
 
         UpdatePanels();
     }
-
+    public void CallGauss(int size){
+        outputTexture = NonLinearEffects.GaussianFilter(effects[currentEffect], size);
+        RenderOutput();
+    }
     public void AddValue(int value){
         if(quantity < sizeGenericMask*sizeGenericMask){
             int line = quantity/sizeGenericMask;
@@ -274,6 +299,10 @@ public class Manager : MonoBehaviour
     {
         SelectEffect();
 
+        RenderOutput();
+    }
+    public void CallLaplace(int type){
+        outputTexture = NonLinearEffects.FilterLaplace(type,normalizeLaplace, effects[currentEffect]);
         RenderOutput();
     }
     private void RenderInput()
@@ -312,7 +341,10 @@ public class Manager : MonoBehaviour
             );
         }
     }
-
+    public void CallMedian(int size){
+        outputTexture = NonLinearEffects.Median(effects[currentEffect], size);
+        RenderOutput();
+    }
     private void SelectEffect()
     {
         Texture2D renderTexture = effects[currentEffect];
@@ -381,6 +413,8 @@ public class Manager : MonoBehaviour
         }
         else if(transformationLogaritimicActive){
             outputTexture = LinearEffects.LogartimicaTransform(renderTexture,rCValue, bCValue, gCValue);
+        }
+        else if(laplacianActive){
         }
         else
         {
@@ -452,6 +486,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
 
                 case 1: //Negativo
@@ -470,6 +507,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
 
                 case 2: // Threshold
@@ -488,6 +528,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
 
                 case 3: //Blur
@@ -506,6 +549,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
 
                 case 4: //Gamma Correction
@@ -524,6 +570,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
 
                 case 5: //Grey Scale
@@ -542,6 +591,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
 
                 case 6: //Pixelization
@@ -560,6 +612,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
 
                 case 7: //Histogram
@@ -578,6 +633,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
 
                 case 8: //Sobel
@@ -596,6 +654,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
                 case 9: //Generic Filter
                     negativeActive = false;
@@ -613,6 +674,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
                 case 10: //Color Fragmentation
                     negativeActive = false;
@@ -630,6 +694,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
                 case 11: //Chroma key
                     negativeActive = false;
@@ -647,6 +714,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
                 case 12: //HSV
                     negativeActive = false;
@@ -664,6 +734,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
                 case 13: //Scale
                     negativeActive = false;
@@ -681,6 +754,9 @@ public class Manager : MonoBehaviour
                     scaleActive = true;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
                 case 14: //Rotation
                     negativeActive = false;
@@ -698,6 +774,9 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= true;
                     transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
                 case 15: //Logaritimic Transform
                     negativeActive = false;
@@ -715,7 +794,71 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = true;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
                     break;
+                case 16: //Laplacian Filter
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive= false;
+                    transformationLogaritimicActive = false;
+                    laplacianActive = true;
+                    medianActive = false;
+                    gaussActive = false;
+                    break;
+                case 17: //Laplacian Filter
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive= false;
+                    transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = true;
+                    gaussActive = false;
+                    break;
+                case 18: //Laplacian Filter
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive= false;
+                    transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = true;
+                    break;
+                
                 default:
                     break;
             }
@@ -776,6 +919,9 @@ public class Manager : MonoBehaviour
         angPanel.SetActive(rotationActive);
         histogramPanelOutput.SetActive(histogramPanelActive);
         transformLogaritimicPanel.SetActive(transformationLogaritimicActive);
+        laplacianPanel.SetActive(laplacianActive);
+        medianPanel.SetActive(medianActive);
+        gaussPanel.SetActive(gaussActive);
 
         if( negativeActive )
         {   
@@ -889,6 +1035,9 @@ public class Manager : MonoBehaviour
             gCValue = (int)gCSlider.value;
             gCText.text = gCValue.ToString();
         }
+        else if(laplacianActive){
+            normalizeLaplace = (int) normalizeLaplaceSlider.value;
+        }
     }
     public void GetImagem(){
         var bp = new BrowserProperties();
@@ -930,8 +1079,8 @@ public class Manager : MonoBehaviour
 
         new FileBrowser().SaveFileBrowser(bp,"teste",".png", path =>
         {
-            Texture2D finalTexture = new Texture2D(inputTexture.width, inputTexture.height);
-            Color[] cores = inputTexture.GetPixels();
+            Texture2D finalTexture = new Texture2D(effects[currentEffect].width, effects[currentEffect].height);
+            Color[] cores = effects[currentEffect].GetPixels();
             finalTexture.SetPixels(cores);
             byte[] bytes = finalTexture.EncodeToJPG();
             File.WriteAllBytes(path, bytes);
@@ -966,9 +1115,15 @@ public class Manager : MonoBehaviour
                 }
                 else
                 {
-
+                    imgBase = DownloadHandlerTexture.GetContent(uwr);
                 }
-            } 
+
+            }
+            inputKey.sprite = Sprite.Create(
+                    imgBase,
+                    new Rect(0, 0, imgBase.width, imgBase.height),
+                    Vector2.zero
+            );
         }
 
     }

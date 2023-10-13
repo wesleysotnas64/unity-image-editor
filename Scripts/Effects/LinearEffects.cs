@@ -277,7 +277,7 @@ namespace Scripts.Effects
         public static Texture2D ApplyHsv(Texture2D inputTexture, int h, float s, float v){
             Color[] pixels = inputTexture.GetPixels();
             Color[] saida = new Color[pixels.Length];
-            double somadorRed = 0;
+            double somadorRed = -1.125;
             double somadorGreen = 1.125;
             double somadorBlue = 0;
             double[] valor = new double[3];
@@ -287,24 +287,24 @@ namespace Scripts.Effects
             for(int i = 0; i <= h;i++){
                 if(i == 61){
                     somadorGreen = 1.125;
-                    somadorRed = -2.25;
+                    somadorRed = -1.125;
                     somadorBlue = 0;
                 }else if(i == 121){
                     somadorBlue = 1.125;
-                    somadorGreen = 0;
+                    somadorGreen = -1.125;
                     somadorRed = 0;
                 }
                 else if(i == 181){
                     somadorBlue = 1.125;
-                    somadorGreen = -2.25;
+                    somadorGreen = -1.125;
                     somadorRed = 0;
                 }
                 else if(i == 241){
-                    somadorBlue = 0;
+                    somadorBlue = -1.125;
                     somadorGreen = 0;
                     somadorRed= 1.125;
                 }else if(i == 301){
-                    somadorBlue = -2.25;
+                    somadorBlue = -1.125;
                     somadorGreen = 0;
                     somadorRed = 1.125;
                 }
@@ -312,6 +312,7 @@ namespace Scripts.Effects
                 valor[1] += somadorGreen; 
                 valor[2] += somadorBlue;
             }
+            s = 1-s;
             for(int i =0; i < pixels.Length; i++){
                 pixels[i].r += (float)valor[0]/255;
                 pixels[i].g += (float)valor[1]/255;
