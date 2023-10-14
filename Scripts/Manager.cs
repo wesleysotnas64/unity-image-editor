@@ -275,6 +275,9 @@ public class Manager : MonoBehaviour
 
         UpdatePanels();
     }
+    public void TestarRgbtoHsv(){
+       LinearEffects.HsvToRgb(24,1,1);
+    }
     public void CallGauss(int size){
         outputTexture = NonLinearEffects.GaussianFilter(effects[currentEffect], size);
         RenderOutput();

@@ -277,58 +277,135 @@ namespace Scripts.Effects
         public static Texture2D ApplyHsv(Texture2D inputTexture, int h, float s, float v){
             Color[] pixels = inputTexture.GetPixels();
             Color[] saida = new Color[pixels.Length];
-            double somadorRed = -1.125;
-            double somadorGreen = 1.125;
-            double somadorBlue = 0;
-            double[] valor = new double[3];
-            valor[0] = 255;
-            valor[1] = 0;
-            valor[2] = 0; 
-            for(int i = 0; i <= h;i++){
-                if(i == 61){
-                    somadorGreen = 1.125;
-                    somadorRed = -1.125;
-                    somadorBlue = 0;
-                }else if(i == 121){
-                    somadorBlue = 1.125;
-                    somadorGreen = -1.125;
-                    somadorRed = 0;
-                }
-                else if(i == 181){
-                    somadorBlue = 1.125;
-                    somadorGreen = -1.125;
-                    somadorRed = 0;
-                }
-                else if(i == 241){
-                    somadorBlue = -1.125;
-                    somadorGreen = 0;
-                    somadorRed= 1.125;
-                }else if(i == 301){
-                    somadorBlue = -1.125;
-                    somadorGreen = 0;
-                    somadorRed = 1.125;
-                }
-                valor[0] += somadorRed;
-                valor[1] += somadorGreen; 
-                valor[2] += somadorBlue;
-            }
-            s = 1-s;
+
             for(int i =0; i < pixels.Length; i++){
-                pixels[i].r += (float)valor[0]/255;
-                pixels[i].g += (float)valor[1]/255;
-                pixels[i].b += (float)valor[2]/255;
-                float somaRed = (255 - (pixels[i].r*255))*s;
-                float somaGreen = (255 - (pixels[i].g*255))*s;
-                float somaBlue = (255 - (pixels[i].b*255))*s;
-                float redColor = (somaRed + pixels[i].r*255)*v;
-                float greenColor = (somaGreen + pixels[i].g*255)*v;
-                float blueColor = (somaBlue + pixels[i].b*255)*v;
-                saida[i] = new Color(redColor/255, greenColor/255, blueColor/255, pixels[i].a);
+                double[] coresHsv = LinearEffects.RgbToHsv(pixels[i].r,pixels[i].g, pixels[i].b);
+                coresHsv[0] += h;
+                if(coresHsv[0] > 360){
+                    coresHsv[0] = 360;
+                }else if(coresHsv[0] < 0){
+                    coresHsv[0] = 0;
+                }
+                coresHsv[1] += s;
+                if(coresHsv[1] > 1){
+                    coresHsv[1] = 1;
+                }else if(coresHsv[1] < 0){
+                    coresHsv[1] = 0;
+                }
+                coresHsv[2] += v;
+                if(coresHsv[2] > 1){
+                    coresHsv[2] = 1;
+                }else if(coresHsv[2] < 0){
+                    coresHsv[2] = 0;
+                }
+                double[] coresRgb = LinearEffects.HsvToRgb(coresHsv[0],coresHsv[1],coresHsv[2]);
+                saida[i] = new Color((float)coresRgb[0],(float)coresRgb[1],(float)coresRgb[2], 1);
             }
             Texture2D outputTexture = new Texture2D(inputTexture.width, inputTexture.height);
             outputTexture.SetPixels(saida);
             outputTexture.Apply();
             return outputTexture;
+        }
+        public static double[] HsvToRgb(double h, double s, double v){
+        double H = h / 360.0;
+        double S = s;
+        double V = v;
+
+        double[] rgb = new double[3];
+
+        if (S == 0)
+        {
+            rgb[0] = rgb[1] = rgb[2] = (int)Math.Round(V * 255);
+        }
+        else
+        {
+            H *= 6; 
+            int i = (int)Math.Floor(H);
+            double f = H - i;
+
+            int p = (int)Math.Round(255 * (V * (1 - S)));
+            int q = (int)Math.Round(255 * (V * (1 - S * f)));
+            int t = (int)Math.Round(255 * (V * (1 - S * (1 - f))));
+
+            V = (int)Math.Round(255 * V);
+
+            switch (i)
+            {
+                case 0:
+                    rgb[0] = (int)V;
+                    rgb[1] = t;
+                    rgb[2] = p;
+                    break;
+                case 1:
+                    rgb[0] = q;
+                    rgb[1] = (int)V;
+                    rgb[2] = p;
+                    break;
+                case 2:
+                    rgb[0] = p;
+                    rgb[1] = (int)V;
+                    rgb[2] = t;
+                    break;
+                case 3:
+                    rgb[0] = p;
+                    rgb[1] = q;
+                    rgb[2] = (int)V;
+                    break;
+                case 4:
+                    rgb[0] = t;
+                    rgb[1] = p;
+                    rgb[2] = (int)V;
+                    break;
+                default:
+                    rgb[0] = (int)V;
+                    rgb[1] = p;
+                    rgb[2] = q;
+                    break;
+            }
+        }
+        rgb[0] = Math.Round(rgb[0]/255,2);
+        rgb[1] = Math.Round(rgb[1]/255,2);
+        rgb[2] = Math.Round(rgb[2]/255,2);
+
+        return rgb;
+    }
+        public static double[] RgbToHsv(double r, double g, double b){
+            double R = Math.Round(r,2);
+            double G = Math.Round(g,2);
+            double B = Math.Round(b,2);
+
+            double[] hsv = new double[3];
+
+            double max = Math.Max(R, Math.Max(G, B));
+            double min = Math.Min(R, Math.Min(G, B));
+
+            // Calculando a Matiz (H)
+            if (max == min){
+                hsv[0] = 0;
+            }
+            else if (max == R){
+                hsv[0] = (int)((60 * ((G - B) / (max - min)) + 360) % 360);
+            }
+            else if (max == G){
+                hsv[0] = (int)((60 * ((B - R) / (max - min)) + 120) % 360);
+            }
+            else if (max == B){
+                hsv[0] = (int)((60 * ((R - G) / (max - min)) + 240) % 360);
+            }
+
+            // Calculando a Saturação (S)
+            if (max == 0)
+            {
+                hsv[1] = 0;
+            }
+            else
+            {
+                hsv[1] = Math.Round((1 - (min / max)), 2);
+            }
+
+            // Calculando o Valor (V)
+            hsv[2] = max;
+            return hsv;
         }
 
     }
