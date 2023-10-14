@@ -274,7 +274,7 @@ namespace Scripts.Effects
             return outputTexture;
         }
 
-        public static Texture2D ApplyHsv(Texture2D inputTexture, int h, float s, float v){
+        public static Texture2D ApplyHsv(Texture2D inputTexture, int h, double s, double v){
             Color[] pixels = inputTexture.GetPixels();
             Color[] saida = new Color[pixels.Length];
 
@@ -299,7 +299,7 @@ namespace Scripts.Effects
                     coresHsv[2] = 0;
                 }
                 double[] coresRgb = LinearEffects.HsvToRgb(coresHsv[0],coresHsv[1],coresHsv[2]);
-                saida[i] = new Color((float)coresRgb[0],(float)coresRgb[1],(float)coresRgb[2], 1);
+                saida[i] = new Color((float)Math.Round(coresRgb[0],2),(float)Math.Round(coresRgb[1],2),(float)Math.Round(coresRgb[2],2), 1);
             }
             Texture2D outputTexture = new Texture2D(inputTexture.width, inputTexture.height);
             outputTexture.SetPixels(saida);
@@ -315,7 +315,9 @@ namespace Scripts.Effects
 
         if (S == 0)
         {
-            rgb[0] = rgb[1] = rgb[2] = (int)Math.Round(V * 255);
+            rgb[0] = (int)Math.Round(V * 255);
+            rgb[1] = (int)Math.Round(V * 255);
+            rgb[2] = (int)Math.Round(V * 255);
         }
         else
         {
@@ -370,9 +372,9 @@ namespace Scripts.Effects
         return rgb;
     }
         public static double[] RgbToHsv(double r, double g, double b){
-            double R = Math.Round(r,2);
-            double G = Math.Round(g,2);
-            double B = Math.Round(b,2);
+            double R = Math.Round(r,3);
+            double G = Math.Round(g,3);
+            double B = Math.Round(b,3);
 
             double[] hsv = new double[3];
 

@@ -9,6 +9,7 @@ using AnotherFileBrowser.Windows;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 
 public class Manager : MonoBehaviour
@@ -169,8 +170,8 @@ public class Manager : MonoBehaviour
     public Text sText;
     public Text vText;
     public int h;
-    public float s;
-    public float v;
+    public double s;
+    public double v;
 
     [Header("Scale")]
     public float scaleValue;
@@ -275,9 +276,6 @@ public class Manager : MonoBehaviour
 
         UpdatePanels();
     }
-    public void TestarRgbtoHsv(){
-       LinearEffects.HsvToRgb(24,1,1);
-    }
     public void CallGauss(int size){
         outputTexture = NonLinearEffects.GaussianFilter(effects[currentEffect], size);
         RenderOutput();
@@ -332,7 +330,20 @@ public class Manager : MonoBehaviour
             );
         }
     }
-
+    public void testeHsvToRgb(){
+        double[] rgb = LinearEffects.HsvToRgb(180,0.81,1.0);
+        Debug.Log("de hsv para rgb");
+        Debug.Log(rgb[0]);
+        Debug.Log(rgb[1]);
+        Debug.Log(rgb[2]);
+    }
+    public void testeRgbToHsv(){
+        double[] hsv = LinearEffects.RgbToHsv(0.18,1.0,1.0);
+        Debug.Log("de rgb para hsv");
+        Debug.Log(hsv[0]);
+        Debug.Log(hsv[1]);
+        Debug.Log(hsv[2]);
+    }
     private void RenderOutput()
     {
         if (outputRender != null)
@@ -1013,9 +1024,9 @@ public class Manager : MonoBehaviour
         }else if(hsvActive){
             h = (int)hLevel.value;
             hText.text = h.ToString();
-            s = sLevel.value;
+            s = Math.Round(sLevel.value,2);
             sText.text = s.ToString();
-            v = vLevel.value;
+            v = Math.Round(vLevel.value,2);
             vText.text = v.ToString();
         }
         else if(scaleActive){

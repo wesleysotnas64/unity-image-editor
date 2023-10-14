@@ -15,9 +15,11 @@ public class LinearTransformation : MonoBehaviour
     {
         
     }
-    public static Color InterpolacaoLinearRotacao(Texture2D inputTexture, float x, float y){
-        float xComplement = (float)Convert.ToDouble(x - Convert.ToInt32(x));
-        float yComplement = (float)Convert.ToDouble(y - Convert.ToInt32(y));
+    public static Color InterpolacaoLinearRotacao(Texture2D inputTexture, double x, double y){
+        double xComplement = Convert.ToDouble(x - Convert.ToInt32(x));
+        double yComplement = Convert.ToDouble(y - Convert.ToInt32(y));
+        xComplement = Math.Round(xComplement,3);
+        yComplement = Math.Round(yComplement,3);
         Color posX1 = inputTexture.GetPixel((int)x, (int)y);
         Color posX2 = inputTexture.GetPixel((int)x + 1, (int)y);
         Color posX3 = inputTexture.GetPixel((int)x, (int)y+1);
@@ -88,6 +90,18 @@ public class LinearTransformation : MonoBehaviour
                     int xCord = Convert.ToInt32((j * matrizRotacao[0,0]) + (i * matrizRotacao[0,1]));
                     int yCord = Convert.ToInt32((j * matrizRotacao[1,0]) + (i * matrizRotacao[1,1]));
                     outputTexture.SetPixel(xCord,yCord, inputTexture.GetPixel(j,i));
+                }
+            }
+        }else if(typeTransform == 2){
+            for(int i =0; i < inputTexture.height; i++){
+                for(int j=0; j < inputTexture.width;j++){
+                    int xCord = Convert.ToInt32(((j) * matrizRotacao[0,0]) + ((i) * matrizRotacao[0,1]));
+                    int yCord = Convert.ToInt32(((j) * matrizRotacao[1,0]) + ((i) * matrizRotacao[1,1]));
+                    double xCordCalc = ((j) * matrizRotacao[0,0] + (i) * matrizRotacao[0,1]);
+                    double yCordCalc = ((j) * matrizRotacao[1,0] + (i) * matrizRotacao[1,1]);
+                    if(xCordCalc > 0 && yCordCalc > 0){
+                        outputTexture.SetPixel(xCord,yCord, InterpolacaoLinearRotacao(inputTexture,xCordCalc, yCordCalc));
+                    }
                 }
             }
         }
