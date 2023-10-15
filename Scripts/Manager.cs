@@ -225,6 +225,18 @@ public class Manager : MonoBehaviour
 
     public GameObject gaussPanel;
     public bool gaussActive;
+    [Header("High Boost")]
+
+    public GameObject highBoostPanel;
+    public bool highBoostActive;
+    public float coeficient;
+    public int normalizeHighBoost;
+    public int sizeHighBoost;
+    public Slider coeficientSlider;
+    public Slider normalizeHighBoostSlider;
+    public Slider sizeHighBoostSlider;
+    public Text coeficientText;
+    public Text sizeHighBoostText;
 
 
 
@@ -247,6 +259,7 @@ public class Manager : MonoBehaviour
         laplacianActive = false;
         medianActive = false;
         gaussActive = false;
+        highBoostActive = false;
 
         //histogramObj = new Histogram();
 
@@ -430,6 +443,9 @@ public class Manager : MonoBehaviour
         }
         else if(laplacianActive){
         }
+        else if(highBoostActive){
+            outputTexture = NonLinearEffects.HighBoost(renderTexture,coeficient,normalizeHighBoost, sizeHighBoost);
+        }
         else
         {
             //outputTexture = renderTexture;
@@ -503,6 +519,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
 
                 case 1: //Negativo
@@ -524,6 +541,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
 
                 case 2: // Threshold
@@ -545,6 +563,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
 
                 case 3: //Blur
@@ -566,6 +585,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
 
                 case 4: //Gamma Correction
@@ -587,6 +607,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
 
                 case 5: //Grey Scale
@@ -608,6 +629,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
 
                 case 6: //Pixelization
@@ -629,6 +651,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
 
                 case 7: //Histogram
@@ -650,6 +673,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
 
                 case 8: //Sobel
@@ -671,6 +695,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
                 case 9: //Generic Filter
                     negativeActive = false;
@@ -691,6 +716,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
                 case 10: //Color Fragmentation
                     negativeActive = false;
@@ -711,6 +737,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
                 case 11: //Chroma key
                     negativeActive = false;
@@ -731,6 +758,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
                 case 12: //HSV
                     negativeActive = false;
@@ -751,6 +779,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
                 case 13: //Scale
                     negativeActive = false;
@@ -771,6 +800,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
                 case 14: //Rotation
                     negativeActive = false;
@@ -791,6 +821,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
                 case 15: //Logaritimic Transform
                     negativeActive = false;
@@ -811,6 +842,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
                 case 16: //Laplacian Filter
                     negativeActive = false;
@@ -831,6 +863,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = true;
                     medianActive = false;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
                 case 17: //Laplacian Filter
                     negativeActive = false;
@@ -851,6 +884,7 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = true;
                     gaussActive = false;
+                    highBoostActive = false;
                     break;
                 case 18: //Laplacian Filter
                     negativeActive = false;
@@ -871,6 +905,28 @@ public class Manager : MonoBehaviour
                     laplacianActive = false;
                     medianActive = false;
                     gaussActive = true;
+                    highBoostActive = false;
+                    break;
+                case 19: //High Boost
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive= false;
+                    transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    highBoostActive = true;
                     break;
                 
                 default:
@@ -936,6 +992,7 @@ public class Manager : MonoBehaviour
         laplacianPanel.SetActive(laplacianActive);
         medianPanel.SetActive(medianActive);
         gaussPanel.SetActive(gaussActive);
+        highBoostPanel.SetActive(highBoostActive);
 
         if( negativeActive )
         {   
@@ -1051,6 +1108,13 @@ public class Manager : MonoBehaviour
         }
         else if(laplacianActive){
             normalizeLaplace = (int) normalizeLaplaceSlider.value;
+        }
+        else if(highBoostActive){
+            normalizeHighBoost = (int)normalizeHighBoostSlider.value;
+            coeficient = coeficientSlider.value;
+            coeficientText.text = coeficient.ToString();
+            sizeHighBoost = (int)sizeHighBoostSlider.value;
+            sizeHighBoostText.text = sizeHighBoost.ToString();
         }
     }
     public void GetImagem(){

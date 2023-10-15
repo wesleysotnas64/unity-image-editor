@@ -145,6 +145,38 @@ namespace Scripts.Effects
             outputTexture.Apply();
             return outputTexture;
         }
+        public static Texture2D HighBoost(Texture2D inputTexture, float coeficient, int normalize, int size){
+            size = (size*2)+1;
+            Texture2D output = new Texture2D(inputTexture.width, inputTexture.height);
+            Texture2D blurImage = GaussianFilter(inputTexture,size);
+            Color[,] realce = new Color[inputTexture.height, inputTexture.width];
+            Color[,] image = new Color[inputTexture.height, inputTexture.width];
+            Color[,] final = new Color[inputTexture.height, inputTexture.width];
+            int xText;
+            int ytext = 0;
+            for(int i = 0; i< inputTexture.height; i++){
+                xText = 0;
+                for(int j = 0; j< inputTexture.width; j++){
+                    realce[i,j] = inputTexture.GetPixel(xText,ytext) - blurImage.GetPixel(xText,ytext);
+                    image[i,j] = inputTexture.GetPixel(xText,ytext);
+                    final[i,j] = image[i,j] - (coeficient*realce[i,j]);
+                    xText++;
+                }
+                ytext++;
+            }
+            output.Apply();
+            FilterConv finalOutput = new FilterConv();
+            finalOutput.SetImg(output);
+            finalOutput.PassImage(final);
+            if(normalize == 1){
+               finalOutput.NormalizeImgProc(); 
+            }
+            output = finalOutput.ReturnImage();
+            output.Apply();
+            return output;
+
+
+        }
         public static Texture2D FilterLaplace(int type,int normalize, Texture2D inputTexture){
             float[,] mask = new float[3,3];
             if(type == 1){

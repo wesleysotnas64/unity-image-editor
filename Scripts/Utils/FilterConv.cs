@@ -138,6 +138,9 @@ namespace Scripts.Utils
                 }
             }
         }
+        public Color[,] GetImg(){
+            return this.img;
+        } 
         public Color[,] getImgProc(){
             return this.imgProc;
         }
