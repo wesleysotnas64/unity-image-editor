@@ -5,63 +5,37 @@ using UnityEngine.UI;
 
 public class Point : MonoBehaviour
 {
-    private SpriteRenderer spriteRenderer;
-    private Image img;
+    public GameObject piecewiseLinear;
 
-    private Color defaultColor;
-    private Color onHoverColor;
+    public GameObject gOPoint;
+    public Slider xSlider;
+    public Slider ySlider;
+    public Text xText;
+    public Text yText;
 
-    private bool isHover;
+    public Vector2 values;
 
     void Start()
     {
-        defaultColor = new Color(1,1,1);
-        onHoverColor = new Color(0,1,0);
-        img = GetComponent<Image>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.color = defaultColor;
-        img.color = Color.cyan;
+        GetAllValues();
+        piecewiseLinear = GameObject.Find("Linear por Partes");
     }
 
-    void Update()
+    public void GetAllValues()
     {
-        if(IsHover)
-        {
-            if (Input.GetMouseButton(0))
-            {
-                MouseDrag();
-            }
-        }
+        values.x = xSlider.value;
+        values.y = ySlider.value;
+
+        xText.text = values.x.ToString();
+        yText.text = values.y.ToString();
+
+        GameObject.Find("Manager").GetComponent<Manager>().RenderManager();
     }
 
-    private void MouseDrag()
+    public void DeleteThisPoint()
     {
-        Vector3 mousePosition = Input.mousePosition;
-        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-        mousePosition.z = 0;
-
-        transform.position = mousePosition;
+        piecewiseLinear.GetComponent<PiecewiseLinear>().RmvPoint(this.gameObject);
+        Destroy(gOPoint);
     }
 
-    private void OnMouseEnter()
-    {
-        spriteRenderer.color = onHoverColor;
-        IsHover = true;
-        if(img != null)
-        {
-            img.color = onHoverColor;
-        }
-    }
-
-    private void OnMouseExit()
-    {
-        spriteRenderer.color = defaultColor;
-        IsHover = false;
-    }
-
-    public bool IsHover
-    {
-        get { return isHover; }
-        private set { this.isHover = value; }
-    }
 }

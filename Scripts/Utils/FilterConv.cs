@@ -22,6 +22,40 @@ namespace Scripts.Utils
             maxValue = new Color(-99999, -99999, -99999, 1);
         }
 
+        public Color CalcKernelMedian(int width, int height, int i, int j, int desloc)
+        {
+            Color px;
+            int pos = 0;
+            float[] colors = new float[sizeMask * sizeMask];
+            for (int iImg = (i - desloc); iImg <= (i + desloc); iImg++)
+            {
+                for (int jImg = (j - desloc); jImg <= (j + desloc); jImg++)
+                {
+                    if (InsideTexture(width, height, iImg, jImg))
+                    {
+                        px = img[iImg, jImg];
+                        colors[pos] = px.r;
+                        pos += 1;
+                    }
+                }
+            }
+            Array.Sort(colors);
+            Color color = new Color(colors[(sizeMask * sizeMask) / 2], colors[(sizeMask * sizeMask) / 2], colors[(sizeMask * sizeMask) / 2], 1);
+            return color;
+        }
+
+        public void ApplyMedian()
+        {
+            int desloc = (sizeMask - 1) / 2;
+            imgProc = new Color[this.height, this.width];
+            for (int i = 0; i < this.height; i++)
+            {
+                for (int j = 0; j < this.width; j++)
+                {
+                    imgProc[i, j] = CalcKernelMedian(this.width, this.height, i, j, desloc);
+                }
+            }
+        }
 
         public Texture2D ReturnImage(){
             Texture2D final = new Texture2D(this.width, this.height);
@@ -70,7 +104,7 @@ namespace Scripts.Utils
             minValue.r = sumR < minValue.r ? sumR : minValue.r;
             minValue.g = sumG < minValue.g ? sumG : minValue.g;
             minValue.b = sumB < minValue.b ? sumB : minValue.b;
-            //Debug.Log(sumR +" | "+ sumG +" | "+ sumB);
+
             return new Color(sumR, sumG, sumB, 1);
         }
         private static bool InsideTexture(int width, int height, int i, int j)
@@ -159,6 +193,11 @@ namespace Scripts.Utils
             this.sizeMask = sizeMask;
             this.mask = new float[sizeMask, sizeMask];
             this.mask = mask;
+        }
+
+        public Color[,] GetImg()
+        {
+            return this.img;
         }
     }
 

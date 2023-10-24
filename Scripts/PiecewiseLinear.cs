@@ -1,72 +1,75 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 
 public class PiecewiseLinear : MonoBehaviour
 {
-    public GameObject point;
-    public List<GameObject> points;
-    private LineRenderer lineRenderer;
-    void Start()
+
+    public GameObject BaseGoPoint;
+    public List<GameObject> gOPoints;
+    public Vector3 firstPosition;
+
+    private void Start()
     {
-        lineRenderer = GetComponent<LineRenderer>();
-        //lineRenderer.positionCount = points.Count;
+        firstPosition = gOPoints[0].GetComponent<RectTransform>().localPosition;
     }
 
-    void Update()
+    public void AddPoint()
     {
-        if(Input.GetMouseButtonDown(0) && VerifyHover() == false)
-        {
+        int count = gOPoints.Count;
+        GameObject point = Instantiate(BaseGoPoint);
+        point.transform.SetParent(transform);
+        point.GetComponent<RectTransform>().localPosition = firstPosition + new Vector3(0, -40 * count, 0);
+        point.GetComponent<RectTransform>().localScale = Vector3.one;
+        gOPoints.Add(point);
+    }
 
+    public void RmvPoint(GameObject go)
+    {
+        gOPoints.Remove(go);
+
+        Organize();
+    }
+
+
+    public void Organize()
+    {
+        int i = 0;
+        foreach(GameObject go in gOPoints)
+        {
+            go.GetComponent<RectTransform>().localPosition = firstPosition + new Vector3(0, -40 * i, 0);
+            i++;
         }
     }
 
-    private void CreateAndInsertPoint()
+    public float VerifyInterval(float x)
     {
-        Vector3 mousePosition = Input.mousePosition;
-        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-        mousePosition.z = 0;
+        List<GameObject> list = new List<GameObject>();
+        list = gOPoints;
+        list.Sort((a, b) => a.GetComponent<Point>().values.x.CompareTo(b.GetComponent<Point>().values.x));
 
-        if( mousePosition.x >= -130 &&
-            mousePosition.y >=  -90 &&
-            mousePosition.x <=  130 &&
-            mousePosition.y <=   90)
+        float a;
+        float b;
+        float y = x;
+
+        Vector2 p1;
+        Vector2 p2;
+        for(int i = 0; i < list.Count-1; i++)
         {
-            int index = GetInterval(mousePosition.x);
-
-            GameObject p = Instantiate(point);
-            p.transform.parent = transform;
-            p.transform.position = mousePosition;
-            points.Insert(index, p);
-
-        }
-
-    }
-
-    private bool VerifyHover()
-    {
-        //foreach(GameObject p in points)
-        //{
-        //    if(p.GetComponent<Point>().IsHover)
-        //    {
-        //        return true;
-        //    }
-        //}
-
-        return false;
-    }
-
-    private int GetInterval(float xPosition)
-    {
-        for (int i = 0; i < points.Count; i++)
-        {
-            if((xPosition > points[i].transform.position.x) && (xPosition < points[i+1].transform.position.x))
+            p1 = list[i].GetComponent<Point>().values;
+            p2 = list[i + 1].GetComponent<Point>().values;
+            if ( x >= p1.x && x <= p2.x)
             {
-                return i + 1;
+                a = (p2.y - p1.y) / (p2.x - p1.x);
+                //b = p2.y - a * p1.x;
+                b = ((p1.y*p2.x)-(p2.y*p1.x)) /(p2.x - p1.x);
+
+                return (a * x) + b;
             }
         }
 
-        return 0;
+        return y;
     }
-
 }

@@ -39,7 +39,6 @@ public class Histogram : MonoBehaviour
     public static Texture2D ReturnHistogramRed(){
         Texture2D saida = new Texture2D(3315, 2000);
         int espaco = (int)saida.width/255;
-        Debug.Log(espaco);
         int cont = 0;
         int pos = 0;
         Color black = new Color(0,0,0,1);
@@ -91,7 +90,6 @@ public class Histogram : MonoBehaviour
         public static Texture2D ReturnHistogramBlue(){
         Texture2D saida = new Texture2D(3315, 2000);
         int espaco = (int)saida.width/255;
-        Debug.Log(espaco);
         int cont = 0;
         int pos = 0;
         Color black = new Color(0,0,0,1);
@@ -129,19 +127,16 @@ public class Histogram : MonoBehaviour
             valor = (redChannel[i] / (float)length) * 255;
             redEqualized[i] = (int)valor;
             if(valor > 0){
-                Debug.Log("pos["+i.ToString()+"], valor:"+valor.ToString());
             }
 
             valor = (greenChannel[i] / (float)length) * 255;
             greenEqualized[i] = (int)valor;
             if(valor > 0){
-                Debug.Log("pos["+i.ToString()+"], valor:"+valor.ToString());
             }
 
             valor = (blueChannel[i] / (float)length) * 255;
             blueEqualized[i] = (int)valor;
             if(valor > 0){
-                Debug.Log("pos["+i.ToString()+"], valor:"+valor.ToString());
             }
         }
 

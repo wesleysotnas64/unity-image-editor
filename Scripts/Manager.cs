@@ -9,7 +9,7 @@ using AnotherFileBrowser.Windows;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-
+using System;
 
 public class Manager : MonoBehaviour
 {
@@ -30,6 +30,7 @@ public class Manager : MonoBehaviour
     public Image histogramRedOutput;
     public Image histogramGreenOutput;
     public Image histogramBlueOutput;
+    public bool applyHisto;
 
     [Header("Dropdown Control")]
     public Dropdown dropdown; 
@@ -68,17 +69,22 @@ public class Manager : MonoBehaviour
 
     [Header("Gamma Correcition Control")]
     public bool gammaActive;
+    public bool gammaRGBActive;
     public float gammaRedLevel;
     public float gammaGreenLevel;
     public float gammaBlueLevel;
+    public float gammaRGBLevel;
     public float gammaMaxLevel;
     public GameObject gammaPanel;
+    public Toggle gammaRGBActiveToggle;
     public Slider gammaRedSliderLevel;
     public Slider gammaGreenSliderLevel;
     public Slider gammaBlueSliderLevel;
+    public Slider gammaRGBSliderLevel;
     public Text gammaRedTextLevel;
     public Text gammaGreenTextLevel;
     public Text gammaBlueTextLevel;
+    public Text gammaRGBTextLevel;
 
     [Header("Grey Scale Control")]
     public bool greyScaleActive;
@@ -123,6 +129,15 @@ public class Manager : MonoBehaviour
     public int multiplier;
     public Slider multiplierSlide;
     public Text multiplierText;
+    public List<Text> genericTextsLine1;
+    public List<Text> genericTextsLine2;
+    public List<Text> genericTextsLine3;
+    public List<Text> genericTextsLine4;
+    public List<Text> genericTextsLine5;
+    public List<Text> genericTextsLine6;
+    public List<Text> genericTextsLine7;
+    public List<Text> genericTextsLine8;
+    public List<Text> genericTextsLine9;
 
     [Header("Color fragmentation")]
     public bool colorFragmentationActive;
@@ -169,8 +184,8 @@ public class Manager : MonoBehaviour
     public Text sText;
     public Text vText;
     public int h;
-    public float s;
-    public float v;
+    public double s;
+    public double v;
 
     [Header("Scale")]
     public float scaleValue;
@@ -196,18 +211,61 @@ public class Manager : MonoBehaviour
 
     public GameObject transformLogaritimicPanel;
     public bool transformationLogaritimicActive;
+    public bool rgbLogaritmActive;
     public int rCValue;
     public int bCValue;
     public int gCValue;
+    public int rgbCValue;
 
     public Slider rCSlider;
     public Slider bCSlider;
     public Slider gCSlider;
+    public Slider rgbCSlider;
 
     public Text rCText;
     public Text gCText;
     public Text bCText;
+    public Text rgbCText;
 
+    public Toggle toggleRGBActive;
+
+    [Header("Linear por Partes Control")]
+    public bool piecewiseLinearActive;
+    public GameObject piecewiseLinearPanel;
+
+    [Header("Laplacian Filter")]
+
+    public GameObject laplacianPanel;
+    public bool laplacianActive;
+    public int normalizeLaplace;
+    public Slider normalizeLaplaceSlider;
+
+    [Header("Filtro mediana")]
+
+    public GameObject medianPanel;
+    public bool medianActive;
+
+    [Header("Filtro Gaussie")]
+
+    public GameObject gaussPanel;
+    public bool gaussActive;
+
+    [Header("High Boost")]
+
+    public GameObject highBoostPanel;
+    public bool highBoostActive;
+    public float coeficient;
+    public int normalizeHighBoost;
+    public int sizeHighBoost;
+    public Slider coeficientSlider;
+    public Slider normalizeHighBoostSlider;
+    public Slider sizeHighBoostSlider;
+    public Text coeficientText;
+    public Text sizeHighBoostText;
+
+    [Header("Furrier Transform Control")]
+    public bool furrierTransformActive;
+    public GameObject furrierTransformPanel;
 
     private void Start()
     {
@@ -224,8 +282,12 @@ public class Manager : MonoBehaviour
         scaleActive = false;
         histogramPanelActive = false;
         transformationLogaritimicActive = false;
+        rgbLogaritmActive = true;
+        toggleRGBActive.isOn = rgbLogaritmActive;
 
-        //histogramObj = new Histogram();
+        laplacianActive = false;
+        medianActive = false;
+        gaussActive = false;
 
         blurMaxLevel = 4;
         gammaMaxLevel = 2.0f;
@@ -235,6 +297,9 @@ public class Manager : MonoBehaviour
         greyScaleWeightGreen = 1.0f;
         greyScaleWeightBlue = 1.0f;
         pixelizationPixelSizeMax = 32;
+
+        piecewiseLinearActive = false;
+        furrierTransformActive = false;
 
         effects = new List<Texture2D>();
         currentEffect = 0;
@@ -255,20 +320,114 @@ public class Manager : MonoBehaviour
     }
 
     public void AddValue(int value){
-        if(quantity < sizeGenericMask*sizeGenericMask){
+        
+        if(quantity < sizeGenericMask*sizeGenericMask)
+        {
             int line = quantity/sizeGenericMask;
-            int column = quantity / sizeGenericMask;
+            int column = (quantity+1) - ((sizeGenericMask * line) + 1);
+            Debug.Log(column);
             genericMask[line,column] = value*multiplier;
             quantity += 1;
-        }else{
-            Debug.Log("Num vo aguentar mais...tira...tira caraio");
+
+            Debug.Log(column);
+            switch (line)
+            {
+                case 0:
+                    genericTextsLine1[column].text = (value * multiplier).ToString();
+                    break;
+
+                case 1:
+                    genericTextsLine2[column].text = (value * multiplier).ToString();
+                    break;
+
+                case 2:
+                    genericTextsLine3[column].text = (value * multiplier).ToString();
+                    break;
+
+                case 3:
+                    genericTextsLine4[column].text = (value * multiplier).ToString();
+                    break;
+
+                case 4:
+                    genericTextsLine5[column].text = (value * multiplier).ToString();
+                    break;
+
+                case 5:
+                    genericTextsLine6[column].text = (value * multiplier).ToString();
+                    break;
+
+                case 6:
+                    genericTextsLine7[column].text = (value * multiplier).ToString();
+                    break;
+
+                case 7:
+                    genericTextsLine8[column].text = (value * multiplier).ToString();
+                    break;
+
+                case 8:
+                    genericTextsLine9[column].text = (value * multiplier).ToString();
+                    break;
+
+                default:
+                    break;
+            }
         }
+        else
+        {
+        }
+
+    }
+
+
+
+    public void CallGauss(int size)
+    {
+        outputTexture = NonLinearEffects.GaussianFilter(effects[currentEffect], size);
+        RenderOutput();
+    }
+
+    public void CallLaplace(int type)
+    {
+        outputTexture = NonLinearEffects.FilterLaplace(type, normalizeLaplace, effects[currentEffect]);
+        RenderOutput();
+    }
+
+    public void CallMedian(int size)
+    {
+        outputTexture = NonLinearEffects.Median(effects[currentEffect], size);
+        RenderOutput();
     }
 
     public void DefineSize(int size){
         sizeGenericMask = size;
+        quantity = 0;
+
+        InitTextDisplay();
     }
 
+    public void InitLineText(List<Text> list)
+    {
+        foreach (Text t in list)
+        {
+            t.text = "0";
+        }
+    }
+
+    public void InitTextDisplay()
+    {
+
+        InitLineText(genericTextsLine1);
+        InitLineText(genericTextsLine2);
+        InitLineText(genericTextsLine3);
+        InitLineText(genericTextsLine4);
+        InitLineText(genericTextsLine5);
+        InitLineText(genericTextsLine6);
+        InitLineText(genericTextsLine7);
+        InitLineText(genericTextsLine8);
+        InitLineText(genericTextsLine9);
+        
+        
+    }
 
     public void RenderManager()
     {
@@ -320,6 +479,9 @@ public class Manager : MonoBehaviour
         {
             outputTexture = LinearEffects.Negative(renderTexture);
         }
+        else if (laplacianActive)
+        {
+        }
         else if (thresholdActive)
         {
             outputTexture = LinearEffects.Threshold(renderTexture, rLevel,gLevel,bLevel, thresholdType, rgbLevel);
@@ -337,7 +499,11 @@ public class Manager : MonoBehaviour
             outputTexture = LinearEffects.GrayScale(renderTexture, greyScaleWeightRed, greyScaleWeightGreen, greyScaleWeightBlue);
         }
         else if(histogramActive && histogramPanelActive){
-            outputTexture = Histogram.EqualizeHistogram(renderTexture);
+            if (applyHisto)
+            {
+                applyHisto = false;
+                outputTexture = Histogram.EqualizeHistogram(renderTexture);
+            }
         }
         else if (pixelizationActive)
         {
@@ -381,6 +547,18 @@ public class Manager : MonoBehaviour
         }
         else if(transformationLogaritimicActive){
             outputTexture = LinearEffects.LogartimicaTransform(renderTexture,rCValue, bCValue, gCValue);
+        }
+        else if (piecewiseLinearActive)
+        {
+            outputTexture = LinearEffects.PiecewiseLinear(renderTexture);
+        }
+        else if (highBoostActive)
+        {
+            outputTexture = NonLinearEffects.HighBoost(renderTexture, coeficient, normalizeHighBoost, sizeHighBoost);
+        }
+        else if ( furrierTransformActive )
+        {
+            //outputTexture = NonLinearEffects.FourierTransform(renderTexture);
         }
         else
         {
@@ -452,6 +630,12 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
 
                 case 1: //Negativo
@@ -470,6 +654,12 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
 
                 case 2: // Threshold
@@ -488,6 +678,12 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
 
                 case 3: //Blur
@@ -506,6 +702,12 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
 
                 case 4: //Gamma Correction
@@ -524,6 +726,13 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
 
                 case 5: //Grey Scale
@@ -542,6 +751,13 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
 
                 case 6: //Pixelization
@@ -560,6 +776,13 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
 
                 case 7: //Histogram
@@ -578,6 +801,13 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
 
                 case 8: //Sobel
@@ -596,6 +826,13 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
                 case 9: //Generic Filter
                     negativeActive = false;
@@ -613,6 +850,13 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
                 case 10: //Color Fragmentation
                     negativeActive = false;
@@ -630,6 +874,13 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
                 case 11: //Chroma key
                     negativeActive = false;
@@ -647,6 +898,13 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
                 case 12: //HSV
                     negativeActive = false;
@@ -664,6 +922,13 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
                 case 13: //Scale
                     negativeActive = false;
@@ -681,6 +946,13 @@ public class Manager : MonoBehaviour
                     scaleActive = true;
                     rotationActive= false;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
                 case 14: //Rotation
                     negativeActive = false;
@@ -698,6 +970,13 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= true;
                     transformationLogaritimicActive = false;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
                 case 15: //Logaritimic Transform
                     negativeActive = false;
@@ -715,7 +994,157 @@ public class Manager : MonoBehaviour
                     scaleActive = false;
                     rotationActive= false;
                     transformationLogaritimicActive = true;
+                    piecewiseLinearActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
                     break;
+
+                case 16: //Laplacian Filter
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive = false;
+                    transformationLogaritimicActive = false;
+                    laplacianActive = true;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
+                    break;
+                case 17: //Median Active
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive = false;
+                    transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = true;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
+                    break;
+                case 18: //Gauss Filter
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive = false;
+                    transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = true;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
+                    break;
+
+                case 19: //HighBoost
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive = false;
+                    transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = true;
+                    furrierTransformActive = false;
+                    break;
+
+                case 20: //Linear por partes
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive = false;
+                    transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = true;
+                    highBoostActive = false;
+                    furrierTransformActive = false;
+                    break;
+
+                case 21: //Transformada de Furrier
+                    negativeActive = false;
+                    thresholdActive = false;
+                    blurActive = false;
+                    gammaActive = false;
+                    greyScaleActive = false;
+                    pixelizationActive = false;
+                    histogramActive = false;
+                    sobelActive = false;
+                    genericActive = false;
+                    colorFragmentationActive = false;
+                    chromaKeyActive = false;
+                    hsvActive = false;
+                    scaleActive = false;
+                    rotationActive = false;
+                    transformationLogaritimicActive = false;
+                    laplacianActive = false;
+                    medianActive = false;
+                    gaussActive = false;
+                    piecewiseLinearActive = false;
+                    highBoostActive = false;
+                    furrierTransformActive = true;
+                    break;
+
                 default:
                     break;
             }
@@ -745,7 +1174,8 @@ public class Manager : MonoBehaviour
     }
 
     public void SetValue(int valueSet){
-            sobelValue = valueSet; 
+        sobelValue = valueSet;
+        RenderManager();
     }
     public void HideShowHistogram(){
         if(histogramPanelActive){
@@ -757,6 +1187,18 @@ public class Manager : MonoBehaviour
         histogramPanelOutput.SetActive(histogramPanelActive);
         RenderInput();
     }
+
+    public void ApplyHistogram()
+    {
+        applyHisto = true;
+        RenderManager();
+    }
+
+    public void ChengeToggleRGBLogaritim()
+    {
+        rgbLogaritmActive = toggleRGBActive.isOn;
+    }
+
     private void PanelManager()
     {
         //Altera visibilidade dos pain�is.
@@ -776,21 +1218,45 @@ public class Manager : MonoBehaviour
         angPanel.SetActive(rotationActive);
         histogramPanelOutput.SetActive(histogramPanelActive);
         transformLogaritimicPanel.SetActive(transformationLogaritimicActive);
+        piecewiseLinearPanel.SetActive(piecewiseLinearActive);
+        laplacianPanel.SetActive(laplacianActive);
+        medianPanel.SetActive(medianActive);
+        gaussPanel.SetActive(gaussActive);
+        highBoostPanel.SetActive(highBoostActive);
+        furrierTransformPanel.SetActive(furrierTransformActive);
 
-        if( negativeActive )
+        if ( negativeActive )
         {   
         }
         else if( thresholdActive)
         {
-            rLevel = rSliderLevel.value;
-            rTextLevel.text = rLevel.ToString();
-            gLevel = gSliderLevel.value;
-            gTextLevel.text = gLevel.ToString();
-            bLevel = bSliderLevel.value;
-            bTextLevel.text = bLevel.ToString();
-            rgbLevel = rgbSliderLevel.value;
-            rgbTextLevel.text = rgbLevel.ToString();
             thresholdType = (int)thresholdTypeSlider.value;
+            if(thresholdType == 1)
+            {
+                rgbLevel = rgbSliderLevel.value;
+
+                rLevel = rgbLevel;
+                gLevel = rgbLevel;
+                bLevel = rgbLevel;
+
+                rSliderLevel.value = rLevel;
+                gSliderLevel.value = gLevel;
+                bSliderLevel.value = bLevel;
+            }
+            else
+            {
+                rLevel = rSliderLevel.value;
+                gLevel = gSliderLevel.value;
+                bLevel = bSliderLevel.value;
+
+                rgbLevel = (rLevel + gLevel + bLevel) / 3;
+
+                rgbSliderLevel.value = rgbLevel;
+            }
+            rTextLevel.text = rLevel.ToString();
+            gTextLevel.text = gLevel.ToString();
+            bTextLevel.text = bLevel.ToString();
+            rgbTextLevel.text = rgbLevel.ToString();
             thresholdTypeText.text = thresholdType.ToString();
         }
         else if( blurActive )
@@ -802,17 +1268,36 @@ public class Manager : MonoBehaviour
         }
         else if( gammaActive )
         {
-            gammaRedLevel = gammaRedSliderLevel.value * gammaMaxLevel;
-            gammaRedSliderLevel.value = gammaRedLevel/gammaMaxLevel;
+            gammaRGBActive = gammaRGBActiveToggle.isOn;
+
+            if (gammaRGBActive)
+            {
+                gammaRGBLevel = gammaRGBSliderLevel.value * gammaMaxLevel;
+
+                gammaRedLevel = gammaRGBLevel;
+                gammaGreenLevel = gammaRGBLevel;
+                gammaBlueLevel = gammaRGBLevel;
+
+                gammaRedSliderLevel.value = gammaRedLevel / gammaMaxLevel;
+                gammaGreenSliderLevel.value = gammaGreenLevel / gammaMaxLevel;
+                gammaBlueSliderLevel.value = gammaBlueLevel / gammaMaxLevel;
+            }
+            else
+            {
+                gammaRedLevel = gammaRedSliderLevel.value * gammaMaxLevel;
+                gammaGreenLevel = gammaGreenSliderLevel.value * gammaMaxLevel;
+                gammaBlueLevel = gammaBlueSliderLevel.value * gammaMaxLevel;
+
+                gammaRGBLevel = (gammaRedLevel + gammaGreenLevel + gammaBlueLevel) / gammaMaxLevel;
+
+                gammaRGBSliderLevel.value = gammaRGBLevel;
+
+            }
+
             gammaRedTextLevel.text = gammaRedLevel.ToString();
-
-            gammaGreenLevel = gammaGreenSliderLevel.value * gammaMaxLevel;
-            gammaGreenSliderLevel.value = gammaGreenLevel/gammaMaxLevel;
             gammaGreenTextLevel.text = gammaGreenLevel.ToString();
-
-            gammaBlueLevel = gammaBlueSliderLevel.value * gammaMaxLevel;
-            gammaBlueSliderLevel.value = gammaBlueLevel/gammaMaxLevel;
             gammaBlueTextLevel.text = gammaBlueLevel.ToString();
+            gammaRGBTextLevel.text = gammaRGBLevel.ToString();
         }
         else if ( greyScaleActive )
         {
@@ -864,9 +1349,9 @@ public class Manager : MonoBehaviour
         }else if(hsvActive){
             h = (int)hLevel.value;
             hText.text = h.ToString();
-            s = sLevel.value;
+            s = Math.Round(sLevel.value, 2);
             sText.text = s.ToString();
-            v = vLevel.value;
+            v = Math.Round(vLevel.value, 2);
             vText.text = v.ToString();
         }
         else if(scaleActive){
@@ -882,12 +1367,54 @@ public class Manager : MonoBehaviour
             typeTransformRotText.text = typeTransformRot.ToString();
         }
         else if(transformationLogaritimicActive){
-            rCValue = (int)rCSlider.value;
+            if(rgbLogaritmActive == false)
+            {
+                rCValue = (int)rCSlider.value;
+                rCText.text = rCValue.ToString();
+                bCValue = (int)bCSlider.value;
+                bCText.text = bCValue.ToString();
+                gCValue = (int)gCSlider.value;
+                gCText.text = gCValue.ToString();
+
+                //Aqui faz a média pra fazer o rgb
+                rgbCSlider.value = (float) (rCValue+gCValue+bCValue) / 3;
+            }
+            else
+            {
+                rgbCValue = (int)rgbCSlider.value;
+                rCValue = rgbCValue;
+                gCValue = rgbCValue;
+                bCValue = rgbCValue;
+
+                rCSlider.value = (float) rgbCValue;
+                gCSlider.value = (float) rgbCValue;
+                bCSlider.value = (float) rgbCValue;
+            }
+            
+            rgbCText.text = rgbCValue.ToString();
             rCText.text = rCValue.ToString();
-            bCValue = (int)bCSlider.value;
             bCText.text = bCValue.ToString();
-            gCValue = (int)gCSlider.value;
             gCText.text = gCValue.ToString();
+        }
+        if (piecewiseLinearActive)
+        {
+
+        }
+        else if (laplacianActive)
+        {
+            normalizeLaplace = (int)normalizeLaplaceSlider.value;
+        }
+        else if (highBoostActive)
+        {
+            normalizeHighBoost = (int)normalizeHighBoostSlider.value;
+            coeficient = coeficientSlider.value;
+            coeficientText.text = coeficient.ToString();
+            sizeHighBoost = (int)sizeHighBoostSlider.value;
+            sizeHighBoostText.text = sizeHighBoost.ToString();
+        }
+        else if (furrierTransformActive)
+        {
+
         }
     }
     public void GetImagem(){
@@ -910,7 +1437,6 @@ public class Manager : MonoBehaviour
 
                 if (uwr.isNetworkError || uwr.isHttpError)
                 {
-                    Debug.Log(uwr.error);
                 }
                 else
                 {
@@ -930,8 +1456,8 @@ public class Manager : MonoBehaviour
 
         new FileBrowser().SaveFileBrowser(bp,"teste",".png", path =>
         {
-            Texture2D finalTexture = new Texture2D(inputTexture.width, inputTexture.height);
-            Color[] cores = inputTexture.GetPixels();
+            Texture2D finalTexture = new Texture2D(effects[currentEffect].width, effects[currentEffect].height);
+            Color[] cores = effects[currentEffect].GetPixels();
             finalTexture.SetPixels(cores);
             byte[] bytes = finalTexture.EncodeToJPG();
             File.WriteAllBytes(path, bytes);
@@ -962,7 +1488,6 @@ public class Manager : MonoBehaviour
 
                 if (uwr.isNetworkError || uwr.isHttpError)
                 {
-                    Debug.Log(uwr.error);
                 }
                 else
                 {
